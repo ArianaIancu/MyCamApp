@@ -171,7 +171,8 @@ public class MainActivity extends AppCompatActivity implements IScanner, Compone
     }
 
 
-    // FIND THEM OR WRITE EM
+    // FIND THEM OR WRITE EM 
+    // ??
     public native Bitmap getScannedBitmap(Bitmap bitmap, float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4); // RESULT FRAGMENT
 
     public native Bitmap getGrayBitmap(Bitmap bitmap); // RESULT FRAGMENT
