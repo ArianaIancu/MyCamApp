@@ -1,5 +1,5 @@
 package com.example.lorenai.mycamapp;
-
+// random comment for commit
 import android.Manifest;
 import android.app.AlertDialog;
 import android.app.FragmentTransaction;
