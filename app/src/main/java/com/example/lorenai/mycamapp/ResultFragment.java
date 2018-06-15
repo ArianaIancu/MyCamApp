@@ -4,16 +4,19 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 
+import com.scanlibrary.ScanActivity;
 import java.io.IOException;
 
 /**
@@ -56,13 +59,17 @@ public class ResultFragment extends Fragment {
         setScannedImage(bitmap);
         doneButton = (Button) view.findViewById(R.id.doneButton);
         doneButton.setOnClickListener(new DoneButtonClickListener());
+
+        PreferenceManager.setDefaultValues(getContext(), R.xml.pref_general, false);
+        PreferenceManager.setDefaultValues(getContext(), R.xml.pref_data_sync, false);
+        PreferenceManager.setDefaultValues(getContext(), R.xml.pref_notification, false);
+
     }
 
     private Bitmap getBitmap() {
         Uri uri = getUri();
         try {
             original = Util.getBitmap(getActivity(), uri);
-            getActivity().getContentResolver().delete(uri, null, null);
             return original;
         } catch (IOException e) {
             e.printStackTrace();
@@ -79,6 +86,7 @@ public class ResultFragment extends Fragment {
         scannedImageView.setImageBitmap(scannedImage);
     }
 
+
     private class DoneButtonClickListener implements View.OnClickListener {
         @Override
         public void onClick(View v) {
@@ -92,18 +100,27 @@ public class ResultFragment extends Fragment {
                         if (bitmap == null) {
                             bitmap = original;
                         }
-                        Uri uri = Util.getUri(getActivity(), bitmap);
-                        data.putExtra(ScanConstants.SCANNED_RESULT, uri);
-                        getActivity().setResult(Activity.RESULT_OK, data);
-                        original.recycle();
-                        System.gc();
-                        getActivity().runOnUiThread(new Runnable() {
+                        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+                        if (preferences.getBoolean("example_switch", true) == true){
+                            final Uri uri = Util.getUri(getActivity(), bitmap);
+                            data.putExtra(ScanConstants.SCANNED_RESULT, uri);
+                            getActivity().setResult(Activity.RESULT_OK, data);
+                            System.gc();
+                            getActivity().runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
                                 dismissDialog();
-                                getActivity().finish();
-                            }
+                                Intent intent = new Intent(getActivity(), ColorFinder.class);
+                                Bundle bundle = new Bundle();
+                                bundle.putParcelable("bitmap", uri);
+                                intent.putExtras(bundle);
+                                startActivity(intent);
+
+                                }
                         });
+                        } else {
+                            getActivity().finish();
+                        }
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -115,12 +132,13 @@ public class ResultFragment extends Fragment {
     private class BWButtonClickListener implements View.OnClickListener {
         @Override
         public void onClick(final View v) {
+           final ScanActivity scanA = new ScanActivity();
             showProgressDialog(getResources().getString(R.string.applying_filter));
             AsyncTask.execute(new Runnable() {
                 @Override
                 public void run() {
                     try {
-                        transformed = ((MainActivity) getActivity()).getBWBitmap(original);
+                        transformed = scanA.getBWBitmap(original);
                     } catch (final OutOfMemoryError e) {
                         getActivity().runOnUiThread(new Runnable() {
                             @Override
@@ -148,12 +166,13 @@ public class ResultFragment extends Fragment {
     private class MagicColorButtonClickListener implements View.OnClickListener {
         @Override
         public void onClick(final View v) {
+            final ScanActivity scanA = new ScanActivity();
             showProgressDialog(getResources().getString(R.string.applying_filter));
             AsyncTask.execute(new Runnable() {
                 @Override
                 public void run() {
                     try {
-                        transformed = ((MainActivity) getActivity()).getMagicColorBitmap(original);
+                        transformed = scanA.getMagicColorBitmap(original);
                     } catch (final OutOfMemoryError e) {
                         getActivity().runOnUiThread(new Runnable() {
                             @Override
@@ -196,12 +215,13 @@ public class ResultFragment extends Fragment {
     private class GrayButtonClickListener implements View.OnClickListener {
         @Override
         public void onClick(final View v) {
+            final ScanActivity scanA = new ScanActivity();
             showProgressDialog(getResources().getString(R.string.applying_filter));
             AsyncTask.execute(new Runnable() {
                 @Override
                 public void run() {
                     try {
-                        transformed = ((MainActivity) getActivity()).getGrayBitmap(original);
+                        transformed = scanA.getGrayBitmap(original);
                     } catch (final OutOfMemoryError e) {
                         getActivity().runOnUiThread(new Runnable() {
                             @Override
@@ -240,4 +260,5 @@ public class ResultFragment extends Fragment {
     protected synchronized void dismissDialog() {
         progressDialogFragment.dismissAllowingStateLoss();
     }
+
 }

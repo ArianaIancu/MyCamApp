@@ -1,5 +1,5 @@
 package com.example.lorenai.mycamapp;
-// random comment for commit
+
 import android.Manifest;
 import android.app.AlertDialog;
 import android.app.FragmentTransaction;
@@ -55,11 +55,14 @@ public class MainActivity extends AppCompatActivity implements IScanner, Compone
         mTextMessage = (TextView) findViewById(R.id.message);
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
-    //    navigation.setSelectedItemId(R.id.camera);
+       // navigation.setSelectedItemId(R.id.camera);
 
         PreferenceManager.setDefaultValues(this, R.xml.pref_general, false);
         PreferenceManager.setDefaultValues(this, R.xml.pref_data_sync, false);
         PreferenceManager.setDefaultValues(this, R.xml.pref_notification, false);
+
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        ScanConstants.FOLDER_NAME = preferences.getString("folder_name"," ");
 
     }
 
@@ -68,6 +71,7 @@ public class MainActivity extends AppCompatActivity implements IScanner, Compone
         setContentView(R.layout.scan_layout);
         PickImageFragment fragment = new PickImageFragment(); //here is where it starts to select an img
         fragment.setArguments(CODE_BUNDLE);
+
         android.app.FragmentManager fragmentManager = getFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.add(R.id.content, fragment);
@@ -97,14 +101,12 @@ public class MainActivity extends AppCompatActivity implements IScanner, Compone
         Bundle bundle = new Bundle();
         bundle.putParcelable(ScanConstants.SELECTED_BITMAP, uri);
         fragment.setArguments(bundle);
+
         android.app.FragmentManager fragmentManager = getFragmentManager();
-
-
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.add(R.id.content, fragment);
         fragmentTransaction.addToBackStack(ScanFragment.class.toString());
         fragmentTransaction.commit();
-
     }
 
     @Override
@@ -170,31 +172,26 @@ public class MainActivity extends AppCompatActivity implements IScanner, Compone
         }
     }
 
+    /*
+    public native Bitmap getScannedBitmap(Bitmap bitmap, float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4);
 
-    // FIND THEM OR WRITE EM 
-    // ??
-    public native Bitmap getScannedBitmap(Bitmap bitmap, float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4); // RESULT FRAGMENT
+    public native Bitmap getGrayBitmap(Bitmap bitmap);
 
-    public native Bitmap getGrayBitmap(Bitmap bitmap); // RESULT FRAGMENT
+    public native Bitmap getMagicColorBitmap(Bitmap bitmap);
 
-    public native Bitmap getMagicColorBitmap(Bitmap bitmap); // RESULT FRAGMENT
+    public native Bitmap getBWBitmap(Bitmap bitmap);
 
-    public native Bitmap getBWBitmap(Bitmap bitmap); // RESULT FRAGMENT
-
-    public native float[] getPoints(Bitmap bitmap); // PICK IMAGE FRAGMENT
-
+    public native float[] getPoints(Bitmap bitmap);
+  */
 
     static {
         System.loadLibrary("opencv_java3");
-       // System.loadLibrary("jniLibs");
-        //System.loadLibrary("Scanner");
+//        System.loadLibrary("scanStuf");
+       // System.loadLibrary("jniLibs")
+       // System.loadLibrary("Scanner");
     }
 
-    private void createImageFolder() throws IOException{
-
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        ScanConstants.FOLDER_NAME = preferences.getString("folder_name"," ");
-
+    private void createImageFolder() {
         //Toast.makeText(this,ScanConstants.FOLDER_NAME,Toast.LENGTH_SHORT).show();
 
         mImageFolder = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),ScanConstants.FOLDER_NAME);
@@ -258,6 +255,7 @@ public class MainActivity extends AppCompatActivity implements IScanner, Compone
                 startActivityForResult(cameraIntent, REQUEST_IMAGE_CAPTURE);
             }
         }
+
     }
 
     public  Bitmap uriToBitmap(Context c, Uri uri) {
@@ -273,6 +271,7 @@ public class MainActivity extends AppCompatActivity implements IScanner, Compone
         }
         return null;
     }
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {

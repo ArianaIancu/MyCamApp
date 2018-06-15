@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/black"
+    android:background="@android:color/white"
     android:orientation="vertical">
 
     <LinearLayout
@@ -19,7 +19,7 @@
             android:background="@android:color/transparent"
             android:drawableTop="@drawable/ic_image_black_24dp"
             android:text="Original"
-            android:textColor="@android:color/white" />
+            android:textColor="@color/colorPrimaryDark" />
 <!-- image enhance/ edit -->
         <Button
             android:id="@+id/magicColor"
@@ -30,7 +30,7 @@
             android:drawableTop="@drawable/ic_edit_black_24dp"
             android:singleLine="true"
             android:text="Magic color"
-            android:textColor="@android:color/white" />
+            android:textColor="@color/colorPrimaryDark" />
 
         <Button
             android:id="@+id/grayMode"
@@ -41,7 +41,7 @@
             android:drawableTop="@drawable/ic_cloud_black_24dp"
             android:singleLine="true"
             android:text="Gray Mode"
-            android:textColor="@android:color/white" />
+            android:textColor="@color/colorPrimaryDark" />
 
         <Button
             android:id="@+id/BWMode"
@@ -52,7 +52,7 @@
             android:drawableTop="@drawable/ic_compare_black_24dp"
             android:singleLine="true"
             android:text="B and W"
-            android:textColor="@android:color/white" />
+            android:textColor="@color/colorPrimaryDark" />
     </LinearLayout>
 
     <Button
@@ -63,16 +63,21 @@
         android:background="@color/bottom_background_color"
         android:orientation="horizontal"
         android:padding="@dimen/bottom_bar_padding"
-        android:text="@string/done" />
+        android:text="Next" />
 
 
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="346dp"
         android:layout_above="@id/doneButton"
         android:layout_below="@id/topBar"
         android:layout_gravity="center"
-        android:layout_margin="@dimen/scanPadding">
+        android:layout_marginBottom="53dp"
+        android:layout_marginEnd="@dimen/scanPadding"
+        android:layout_marginLeft="@dimen/scanPadding"
+        android:layout_marginRight="@dimen/scanPadding"
+        android:layout_marginStart="@dimen/scanPadding"
+        android:layout_marginTop="@dimen/scanPadding">
 
         <ImageView
             android:id="@+id/scannedImage"
