@@ -13,7 +13,7 @@
         android:background="@color/bottom_background_color"
         android:orientation="horizontal"
         android:padding="@dimen/bottom_bar_padding"
-        android:text="@string/scan"></Button>
+        android:text="@string/scan" />
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -25,7 +25,7 @@
         <FrameLayout
             android:id="@+id/sourceFrame"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="401dp"
             android:layout_gravity="center"
             android:layout_margin="@dimen/scanPadding">
 
@@ -38,6 +38,7 @@
 
         </FrameLayout>
 
+        <!--
         <com.example.lorenai.mycamapp.PolygonView
             android:id="@+id/polygonView"
             android:layout_width="match_parent"
@@ -46,7 +47,15 @@
             android:visibility="gone">
 
         </com.example.lorenai.mycamapp.PolygonView>
+        -->
 
+<!--
+        <com.theartofdev.edmodo.cropper.CropImageView xmlns:custom="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/cropImageView"
+            android:layout_width="353dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1" />
+-->
     </FrameLayout>
 
 </RelativeLayout>
