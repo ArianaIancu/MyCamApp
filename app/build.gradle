@@ -36,4 +36,5 @@ dependencies {
     implementation project(':scanStuf')
     implementation 'com.android.support:palette-v7:27.1.1'
     implementation 'com.theartofdev.edmodo:android-image-cropper:2.7.+'
+    implementation 'com.google.android.gms:play-services:12.0.1'
 }

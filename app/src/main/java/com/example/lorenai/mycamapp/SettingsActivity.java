@@ -20,6 +20,8 @@ import android.text.TextUtils;
 import android.view.MenuItem;
 import android.support.v4.app.NavUtils;
 
+import com.google.android.gms.common.api.GoogleApiClient;
+
 import java.util.List;
 
 /**

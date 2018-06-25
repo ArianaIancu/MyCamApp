@@ -14,7 +14,7 @@
         <Button
             android:id="@+id/original"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_weight="1"
             android:background="@android:color/transparent"
             android:drawableTop="@drawable/ic_image_black_24dp"
@@ -67,25 +67,39 @@
 
 
     <FrameLayout
-        android:layout_width="match_parent"
+        android:layout_width="342dp"
         android:layout_height="346dp"
-        android:layout_above="@id/doneButton"
-        android:layout_below="@id/topBar"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
         android:layout_gravity="center"
-        android:layout_marginBottom="53dp"
-        android:layout_marginEnd="@dimen/scanPadding"
-        android:layout_marginLeft="@dimen/scanPadding"
-        android:layout_marginRight="@dimen/scanPadding"
-        android:layout_marginStart="@dimen/scanPadding"
-        android:layout_marginTop="@dimen/scanPadding">
+        android:layout_marginTop="64dp">
 
         <ImageView
             android:id="@+id/scannedImage"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="338dp"
+            android:layout_height="346dp"
             android:layout_gravity="center"
             android:layout_margin="@dimen/scanPadding" />
+
     </FrameLayout>
+
+    <Button
+        android:id="@+id/drive_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/doneButton"
+        android:layout_alignParentEnd="true"
+        android:text="Save to Drive"
+        android:onClick="onClickCreateFile"/>
+
+    <Button
+        android:id="@+id/change_drive"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/doneButton"
+        android:layout_toStartOf="@+id/drive_button"
+        android:text="Change Drive Account"
+        android:onClick="onClickChangeDrive"/>
 
 
 </RelativeLayout>

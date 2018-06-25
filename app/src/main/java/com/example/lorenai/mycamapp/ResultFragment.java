@@ -1,6 +1,5 @@
 package com.example.lorenai.mycamapp;
 
-import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.Intent;
@@ -17,7 +16,11 @@ import android.widget.Button;
 import android.widget.ImageView;
 
 import com.scanlibrary.ScanActivity;
+
 import java.io.IOException;
+
+import static android.app.Activity.RESULT_OK;
+
 
 /**
  * Created by jhansi on 29/03/15.
@@ -32,6 +35,7 @@ public class ResultFragment extends Fragment {
     private Button MagicColorButton;
     private Button grayModeButton;
     private Button bwButton;
+    public Button drive;
     private Bitmap transformed;
     private static ProgressDialogFragment progressDialogFragment;
 
@@ -59,6 +63,8 @@ public class ResultFragment extends Fragment {
         setScannedImage(bitmap);
         doneButton = (Button) view.findViewById(R.id.doneButton);
         doneButton.setOnClickListener(new DoneButtonClickListener());
+        drive = (Button) view.findViewById(R.id.drive_button);
+
 
         PreferenceManager.setDefaultValues(getContext(), R.xml.pref_general, false);
         PreferenceManager.setDefaultValues(getContext(), R.xml.pref_data_sync, false);
@@ -86,7 +92,6 @@ public class ResultFragment extends Fragment {
         scannedImageView.setImageBitmap(scannedImage);
     }
 
-
     private class DoneButtonClickListener implements View.OnClickListener {
         @Override
         public void onClick(View v) {
@@ -104,7 +109,7 @@ public class ResultFragment extends Fragment {
                         if (preferences.getBoolean("example_switch", true) == true){
                             final Uri uri = Util.getUri(getActivity(), bitmap);
                             data.putExtra(ScanConstants.SCANNED_RESULT, uri);
-                            getActivity().setResult(Activity.RESULT_OK, data);
+                            getActivity().setResult(RESULT_OK, data);
                             System.gc();
                             getActivity().runOnUiThread(new Runnable() {
                             @Override
