@@ -170,7 +170,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             // updated to reflect the new value, per the Android Design
             // guidelines.
             bindPreferenceSummaryToValue(findPreference("folder_name"));
-            bindPreferenceSummaryToValue(findPreference("example_list"));
         }
 
         @Override
