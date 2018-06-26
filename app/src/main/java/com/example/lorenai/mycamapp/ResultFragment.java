@@ -21,7 +21,6 @@ import java.io.IOException;
 
 import static android.app.Activity.RESULT_OK;
 
-
 /**
  * Created by jhansi on 29/03/15.
  */
@@ -65,11 +64,9 @@ public class ResultFragment extends Fragment {
         doneButton.setOnClickListener(new DoneButtonClickListener());
         drive = (Button) view.findViewById(R.id.drive_button);
 
-
         PreferenceManager.setDefaultValues(getContext(), R.xml.pref_general, false);
         PreferenceManager.setDefaultValues(getContext(), R.xml.pref_data_sync, false);
         PreferenceManager.setDefaultValues(getContext(), R.xml.pref_notification, false);
-
     }
 
     private Bitmap getBitmap() {

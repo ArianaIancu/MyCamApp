@@ -127,7 +127,6 @@ public class ColorFinder extends AppCompatActivity {
         }
     }
 
-
     private void createImageFileName(Bitmap bitmap, File folder) throws IOException {
         String timestamp = new SimpleDateFormat("yyyyMMdd HHmmss").format(new Date());
         String prepend = "IMAGE" + timestamp + "_";
@@ -148,7 +147,5 @@ public class ColorFinder extends AppCompatActivity {
                         Log.i("ExternalStorage", "-> uri=" + uri);
                     }
                 });
-
     }
-
 }

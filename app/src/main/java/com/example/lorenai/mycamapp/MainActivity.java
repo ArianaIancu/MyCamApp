@@ -14,7 +14,6 @@ import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import android.preference.Preference;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
@@ -28,7 +27,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
@@ -36,31 +34,22 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.drive.Drive;
 import com.google.android.gms.drive.DriveApi;
-import com.google.android.gms.drive.DriveContents;
 import com.google.android.gms.drive.DriveFile;
-import com.google.android.gms.drive.DriveFolder;
-import com.google.android.gms.drive.DriveId;
 import com.google.android.gms.drive.MetadataChangeSet;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class MainActivity extends AppCompatActivity implements IScanner, ComponentCallbacks2, GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
 
-    private TextView mTextMessage;
     static final int REQUEST_IMAGE_CAPTURE = 1;
-    private Bitmap mImageBitmap;
     private String mCurrentPhotoPath;
     private File mImageFolder;
-    int REQUEST_CODE;
-    int preference;
     public Button drive;
     Bundle CODE_BUNDLE = new Bundle();
 
@@ -78,8 +67,6 @@ public class MainActivity extends AppCompatActivity implements IScanner, Compone
         if(!hasPermissions(this, PERMISSIONS)){
             ActivityCompat.requestPermissions(this, PERMISSIONS, PERMISSION_ALL);
         }
-
-        mTextMessage = (TextView) findViewById(R.id.message);
         drive = (Button) findViewById(R.id.drive_button);
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
@@ -94,7 +81,6 @@ public class MainActivity extends AppCompatActivity implements IScanner, Compone
 
     }
 
-
     private void init() {
         setContentView(R.layout.scan_layout);
         PickImageFragment fragment = new PickImageFragment(); //here is where it starts to select an img
@@ -104,13 +90,13 @@ public class MainActivity extends AppCompatActivity implements IScanner, Compone
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.add(R.id.content, fragment);
         fragmentTransaction.commit();
-
     }
 
-
+    /*
     protected int getPreferenceContent() {
         return getIntent().getIntExtra(ScanConstants.OPEN_INTENT_PREFERENCE, 0);
     }
+    */
 
     public static boolean hasPermissions(Context context, String... permissions) {
         if (context != null && permissions != null) {
@@ -220,11 +206,7 @@ public class MainActivity extends AppCompatActivity implements IScanner, Compone
     }
 
     private void createImageFolder() {
-        //Toast.makeText(this,ScanConstants.FOLDER_NAME,Toast.LENGTH_SHORT).show();
-
         mImageFolder = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),ScanConstants.FOLDER_NAME);
-        //File imageFile = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
-        //mImageFolder = new File(imageFile,  ScanConstants.FOLDER_NAME);
         if (!mImageFolder.exists()) {
             mImageFolder.mkdir();
         }
@@ -232,7 +214,6 @@ public class MainActivity extends AppCompatActivity implements IScanner, Compone
     }
 
     private File createImageFileName() throws IOException {
-
         createImageFolder();
 
         String timestamp = new SimpleDateFormat("yyyyMMdd HHmmss").format(new Date());
@@ -286,6 +267,7 @@ public class MainActivity extends AppCompatActivity implements IScanner, Compone
 
     }
 
+    /*
     public  Bitmap uriToBitmap(Context c, Uri uri) {
         if (c == null && uri == null) {
             return null;
@@ -299,23 +281,16 @@ public class MainActivity extends AppCompatActivity implements IScanner, Compone
         }
         return null;
     }
-
+    */
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
             try {
-             //  mImageBitmap = uriToBitmap(this, Uri.parse(mCurrentPhotoPath));
-           //     CODE_BUNDLE.putParcelable("IMG", mImageBitmap);
-               //mImageBitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), Uri.parse(mCurrentPhotoPath));
-            //   onBitmapSelect( Uri.parse(mCurrentPhotoPath));
                 if(requestCode == REQUEST_CODE_CREATOR) {
                     Log.i(TAG, "Image successfully saved.");
                 }
                 if(requestCode == REQUEST_IMAGE_CAPTURE) {
                     CODE_BUNDLE.putInt("Gal", 4);
-                    //CODE_BUNDLE.putString("img", mCurrentPhotoPath);
-                    // mImageBitmap = uriToBitmap(getApplicationContext(), Uri.parse(mCurrentPhotoPath));
-                    //CODE_BUNDLE.putParcelable("IMG", mImageBitmap);
                     CODE_BUNDLE.putString("IMG", mCurrentPhotoPath);
                     init();
                 }
@@ -331,13 +306,12 @@ public class MainActivity extends AppCompatActivity implements IScanner, Compone
         sendBroadcast(mediaScanIntent);
     }
 
-
     @Override
     protected void onResume(){
         super.onResume();
     }
 
-    // GOOGLE DRIVE STUFF
+    // GOOGLE DRIVE HERE
 
     private static final String TAG = "Google Drive Activity";
     private static final int REQUEST_CODE_RESOLUTION = 3;
@@ -416,10 +390,7 @@ public class MainActivity extends AppCompatActivity implements IScanner, Compone
     }
 
     public void onClickCreateFile(View view){
-        //fileOperation = true;
         connectDude();
-        // create new contents resource
-      //  Drive.DriveApi.newDriveContents(mGoogleApiClient).setResultCallback(driveContentsCallback);
         saveFileToDrive();
     }
 
@@ -427,12 +398,15 @@ public class MainActivity extends AppCompatActivity implements IScanner, Compone
         mGoogleApiClient.clearDefaultAccountAndReconnect();
     }
 
+
     /**
      * This is Result result handler of Drive contents.
      * this callback method call CreateFileOnGoogleDrive() method
      * and also call OpenFileFromGoogleDrive() method,
      * send intent onActivityResult() method to handle result.
      */
+
+    /*
     final ResultCallback <DriveApi.DriveContentsResult> driveContentsCallback = new ResultCallback<DriveApi.DriveContentsResult>() {
                 @Override
                 public void onResult(DriveApi.DriveContentsResult result) {
@@ -443,11 +417,13 @@ public class MainActivity extends AppCompatActivity implements IScanner, Compone
                     }
                 }
             };
+    */
 
     /**
      * Create a file in root folder using MetadataChangeSet object.
      * @param result
      */
+    /*
     public void CreateFileOnGoogleDrive(DriveApi.DriveContentsResult result){
 
         final DriveContents driveContents = result.getDriveContents();
@@ -478,10 +454,12 @@ public class MainActivity extends AppCompatActivity implements IScanner, Compone
             }
         }.start();
     }
+   */
 
     /**
      * Handle result of Created file
      */
+    /*
     final private ResultCallback<DriveFolder.DriveFileResult> fileCallback = new ResultCallback<DriveFolder.DriveFileResult>() {
                 @Override
                 public void onResult(DriveFolder.DriveFileResult result) {
@@ -491,6 +469,7 @@ public class MainActivity extends AppCompatActivity implements IScanner, Compone
                     return;
                 }
             };
+    */
 
     private void saveFileToDrive() {
         // Start by creating a new contents, and setting a callback.
@@ -540,6 +519,4 @@ public class MainActivity extends AppCompatActivity implements IScanner, Compone
                     }
                 });
     }
-
 }
-

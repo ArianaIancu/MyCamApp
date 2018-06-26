@@ -33,8 +33,6 @@ public class PolygonView extends FrameLayout {
     private ImageView midPointer24;
     private PolygonView polygonView;
 
-
-
     public PolygonView(Context context) {
         super(context);
         this.context = context;
@@ -95,7 +93,6 @@ public class PolygonView extends FrameLayout {
     }
 
     public Map<Integer, PointF> getPoints() {
-
         List<PointF> points = new ArrayList<PointF>();
         points.add(new PointF(pointer1.getX(), pointer1.getY()));
         points.add(new PointF(pointer2.getX(), pointer2.getY()));
@@ -106,7 +103,6 @@ public class PolygonView extends FrameLayout {
     }
 
     public Map<Integer, PointF> getOrderedPoints(List<PointF> points) {
-
         PointF centerPoint = new PointF();
         int size = points.size();
         for (PointF pointF : points) {
@@ -130,12 +126,15 @@ public class PolygonView extends FrameLayout {
         return orderedPoints;
     }
 
+    /*
     public void setPoints(Map<Integer, PointF> pointFMap) {
         if (pointFMap.size() == 4) {
             setPointsCoordinates(pointFMap);
         }
     }
+    */
 
+    /*
     private void setPointsCoordinates(Map<Integer, PointF> pointFMap) {
         pointer1.setX(pointFMap.get(0).x);
         pointer1.setY(pointFMap.get(0).y);
@@ -149,6 +148,7 @@ public class PolygonView extends FrameLayout {
         pointer4.setX(pointFMap.get(3).x);
         pointer4.setY(pointFMap.get(3).y);
     }
+    */
 
     @Override
     protected void dispatchDraw(Canvas canvas) {
@@ -179,7 +179,6 @@ public class PolygonView extends FrameLayout {
     }
 
     private class MidPointTouchListenerImpl implements OnTouchListener {
-
         PointF DownPT = new PointF(); // Record Mouse Position When Pressed Down
         PointF StartPT = new PointF(); // Record Start Position of 'img'
 
@@ -221,7 +220,6 @@ public class PolygonView extends FrameLayout {
                             mainPointer1.setX((int) (mainPointer1.getX() + mv.x));
                         }
                     }
-
                     break;
                 case MotionEvent.ACTION_DOWN:
                     DownPT.x = event.getX();
@@ -255,7 +253,6 @@ public class PolygonView extends FrameLayout {
     }
 
     private class TouchListenerImpl implements OnTouchListener {
-
         PointF DownPT = new PointF(); // Record Mouse Position When Pressed Down
         PointF StartPT = new PointF(); // Record Start Position of 'img'
 

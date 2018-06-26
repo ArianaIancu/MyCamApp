@@ -54,13 +54,10 @@ public class PickImageFragment extends Fragment {
         galleryButton = (ImageButton) view.findViewById(R.id.selectButton2);
         galleryButton.setOnClickListener(new GalleryClickListener());
 
-      //  if (isIntentPreferenceSet()) { // App gets closed here!
-            handleIntentPreference();
-        //} else {
-          // getActivity().finish();
-        //}
+        handleIntentPreference();
     }
 
+    /*
     private void clearTempImages() {
         try {
             File tempFolder = new File(ScanConstants.IMAGE_PATH);
@@ -70,6 +67,7 @@ public class PickImageFragment extends Fragment {
             e.printStackTrace();
         }
     }
+    */
 
     private void handleIntentPreference() {
         int preference = getArguments().getInt("Gal");
@@ -80,6 +78,7 @@ public class PickImageFragment extends Fragment {
         }
     }
 
+    /*
     private boolean isIntentPreferenceSet() {
         int preference = getArguments().getInt(ScanConstants.OPEN_INTENT_PREFERENCE, 0);
         return preference != 0;
@@ -89,7 +88,7 @@ public class PickImageFragment extends Fragment {
         int preference = getArguments().getInt(ScanConstants.OPEN_INTENT_PREFERENCE, 0);
         return preference;
     }
-
+    */
 
     private class CameraButtonClickListener implements View.OnClickListener {
         @Override
@@ -114,33 +113,9 @@ public class PickImageFragment extends Fragment {
     }
 
     public void openCamera() {
-        /*
-        Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        File file = createImageFile();
-        boolean isDirectoryCreated = file.getParentFile().mkdirs();
-        Log.d("", "openCamera: isDirectoryCreated: " + isDirectoryCreated);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            Uri tempFileUri = FileProvider.getUriForFile(getActivity().getApplicationContext(),
-                    "com.scanlibrary.provider", // As defined in Manifest
-                    file);
-            cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, tempFileUri);
-        } else {
-            //Uri tempFileUri = Uri.fromFile(file);
-            Uri tempFileUri = FileProvider.getUriForFile(getContext(), getContext().getApplicationContext().getPackageName() + ".my.package.name.provider", file);
-            cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, tempFileUri);
-        }
-        startActivityForResult(cameraIntent, ScanConstants.START_CAMERA_REQUEST_CODE);
-        */
-
         fileUri = Uri.parse(getArguments().getString("IMG"));
-        //try {
-            //Bitmap bitmap = getBitmap(fileUri);
-        //Bitmap bitmap = getArguments().getParcelable("IMG");
         Bitmap bitmap = uriToBitmap(getContext() , fileUri);
         postImagePick(bitmap);
-        //} catch (IOException e) { // DEAD
-          //  e.printStackTrace();
-        //}
     }
 
     public  Bitmap uriToBitmap(Context c, Uri uri) {
@@ -149,7 +124,6 @@ public class PickImageFragment extends Fragment {
         }
         Bitmap mImageBitmap;
         try {
-            //mImageBitmap = MediaStore.Images.Media.getBitmap(c.getContentResolver(), Uri.fromFile(new File(uri.getPath())));
             mImageBitmap = MediaStore.Images.Media.getBitmap(c.getContentResolver(), FileProvider.getUriForFile(getContext(), getContext().getApplicationContext().getPackageName() + ".my.package.name.provider", new File(uri.getPath())));
             return mImageBitmap;
         } catch (IOException e) {
