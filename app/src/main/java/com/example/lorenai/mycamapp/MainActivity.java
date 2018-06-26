@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.app.FragmentTransaction;
 import android.content.ComponentCallbacks2;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
@@ -55,6 +56,7 @@ public class MainActivity extends AppCompatActivity implements IScanner, Compone
 
     public ImageView scannedImageView;
 
+
     int PERMISSION_ALL = 1;
     String[] PERMISSIONS = {Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE};
 
@@ -64,13 +66,39 @@ public class MainActivity extends AppCompatActivity implements IScanner, Compone
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        final SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        boolean agreed = sharedPreferences.getBoolean("agreed",false);
+        if (!agreed) {
+            new AlertDialog.Builder(this)
+                    .setTitle("License agreement")
+                    .setPositiveButton("Agree", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            SharedPreferences.Editor editor = sharedPreferences.edit();
+                            editor.putBoolean("agreed", true);
+                            editor.commit();
+                        }
+                    })
+                    .setNegativeButton("Exit", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                                finish();
+                            }
+                    })
+                    .setMessage("TERMS")
+                    .setCancelable(false)
+                    .show();
+        }
+
         if(!hasPermissions(this, PERMISSIONS)){
             ActivityCompat.requestPermissions(this, PERMISSIONS, PERMISSION_ALL);
         }
         drive = (Button) findViewById(R.id.drive_button);
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
-       // navigation.setSelectedItemId(R.id.camera);
+
+        //navigation.setSelectedItemId(R.id.camera);
+
 
         PreferenceManager.setDefaultValues(this, R.xml.pref_general, false);
         PreferenceManager.setDefaultValues(this, R.xml.pref_data_sync, false);
