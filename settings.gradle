@@ -1,4 +1,4 @@
-include ':app', ':scanlibrary2', ':scanStuf'
+include ':app', ':scanlibrary2', ':scanStuf', ':scanLibrary'
 include ':openCVLibrary341'
 project(':scanlibrary2').projectDir = new File('scanlibrary')
 project(':scanStuf').projectDir = new File('scanStuff')

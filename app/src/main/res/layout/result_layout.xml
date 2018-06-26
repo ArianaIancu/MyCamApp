@@ -20,7 +20,9 @@
             android:drawableTop="@drawable/ic_image_black_24dp"
             android:text="Original"
             android:textColor="@color/colorPrimaryDark" />
-<!-- image enhance/ edit -->
+
+        <!-- Image edit options -->
+
         <Button
             android:id="@+id/magicColor"
             android:layout_width="0dp"
@@ -53,6 +55,7 @@
             android:singleLine="true"
             android:text="B and W"
             android:textColor="@color/colorPrimaryDark" />
+
     </LinearLayout>
 
     <Button
@@ -64,7 +67,6 @@
         android:orientation="horizontal"
         android:padding="@dimen/bottom_bar_padding"
         android:text="Next" />
-
 
     <FrameLayout
         android:layout_width="342dp"
@@ -100,6 +102,5 @@
         android:layout_toStartOf="@+id/drive_button"
         android:text="Change Drive Account"
         android:onClick="onClickChangeDrive"/>
-
 
 </RelativeLayout>

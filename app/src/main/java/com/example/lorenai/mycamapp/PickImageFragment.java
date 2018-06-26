@@ -1,24 +1,24 @@
 package com.example.lorenai.mycamapp;
 
-import android.app.Activity;
-import android.app.Fragment;
-import android.content.Context;
-import android.content.Intent;
-import android.content.res.AssetFileDescriptor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.net.Uri;
-import android.os.Bundle;
-import android.provider.MediaStore;
-import android.support.v4.content.FileProvider;
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageButton;
-
 import java.io.File;
 import java.io.IOException;
+
+import android.net.Uri;
+import android.util.Log;
+import android.os.Bundle;
+import android.widget.ImageButton;
+import android.provider.MediaStore;
+import android.support.v4.content.FileProvider;
+import android.app.Activity;
+import android.app.Fragment;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.LayoutInflater;
+import android.content.Intent;
+import android.content.Context;
+import android.content.res.AssetFileDescriptor;
 
 /**
  * Created by jhansi on 04/04/15.
@@ -26,10 +26,11 @@ import java.io.IOException;
 public class PickImageFragment extends Fragment {
 
     private View view;
-    private ImageButton cameraButton;
-    private ImageButton galleryButton;
     private Uri fileUri;
     private IScanner scanner;
+
+    private ImageButton cameraButton;
+    private ImageButton galleryButton;
 
     @Override
     public void onAttach(Activity activity) {
@@ -48,7 +49,6 @@ public class PickImageFragment extends Fragment {
     }
 
     private void init() {
-
         cameraButton = (ImageButton) view.findViewById(R.id.cameraButton2);
         cameraButton.setOnClickListener(new CameraButtonClickListener());
         galleryButton = (ImageButton) view.findViewById(R.id.selectButton2);
@@ -56,18 +56,6 @@ public class PickImageFragment extends Fragment {
 
         handleIntentPreference();
     }
-
-    /*
-    private void clearTempImages() {
-        try {
-            File tempFolder = new File(ScanConstants.IMAGE_PATH);
-            for (File f : tempFolder.listFiles())
-                f.delete();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-    */
 
     private void handleIntentPreference() {
         int preference = getArguments().getInt("Gal");
@@ -77,18 +65,6 @@ public class PickImageFragment extends Fragment {
             openMediaContent();
         }
     }
-
-    /*
-    private boolean isIntentPreferenceSet() {
-        int preference = getArguments().getInt(ScanConstants.OPEN_INTENT_PREFERENCE, 0);
-        return preference != 0;
-    }
-
-    private int getIntentPreference() {
-        int preference = getArguments().getInt(ScanConstants.OPEN_INTENT_PREFERENCE, 0);
-        return preference;
-    }
-    */
 
     private class CameraButtonClickListener implements View.OnClickListener {
         @Override
@@ -142,7 +118,6 @@ public class PickImageFragment extends Fragment {
                     case ScanConstants.START_CAMERA_REQUEST_CODE:
                         bitmap = getBitmap(fileUri);
                         break;
-
                     case ScanConstants.PICKFILE_REQUEST_CODE:
                         bitmap = getBitmap(data.getData());
                         break;

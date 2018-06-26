@@ -1,45 +1,45 @@
 package com.example.lorenai.mycamapp;
 
+import java.io.IOException;
+import com.scanlibrary.ScanActivity;
+
+import static android.app.Activity.RESULT_OK;
+import android.net.Uri;
+import android.graphics.Bitmap;
+import android.preference.PreferenceManager;
+import android.os.Bundle;
+import android.os.AsyncTask;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.net.Uri;
-import android.os.AsyncTask;
-import android.os.Bundle;
-import android.preference.PreferenceManager;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
+import android.view.ViewGroup;
 import android.widget.ImageView;
-
-import com.scanlibrary.ScanActivity;
-
-import java.io.IOException;
-
-import static android.app.Activity.RESULT_OK;
+import android.view.LayoutInflater;
 
 /**
  * Created by jhansi on 29/03/15.
  */
+
 public class ResultFragment extends Fragment {
 
     private View view;
     private ImageView scannedImageView;
-    private Button doneButton;
-    private Bitmap original;
-    private Button originalButton;
-    private Button MagicColorButton;
-    private Button grayModeButton;
-    private Button bwButton;
-    public Button drive;
-    private Bitmap transformed;
     private static ProgressDialogFragment progressDialogFragment;
 
-    public ResultFragment() {
-    }
+    private Bitmap original;
+    private Bitmap transformed;
+
+    public Button drive;
+    private Button bwButton;
+    private Button doneButton;
+    private Button originalButton;
+    private Button grayModeButton;
+    private Button MagicColorButton;
+
+    public ResultFragment() { }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -65,8 +65,6 @@ public class ResultFragment extends Fragment {
         drive = (Button) view.findViewById(R.id.drive_button);
 
         PreferenceManager.setDefaultValues(getContext(), R.xml.pref_general, false);
-        PreferenceManager.setDefaultValues(getContext(), R.xml.pref_data_sync, false);
-        PreferenceManager.setDefaultValues(getContext(), R.xml.pref_notification, false);
     }
 
     private Bitmap getBitmap() {
@@ -117,7 +115,6 @@ public class ResultFragment extends Fragment {
                                 bundle.putParcelable("bitmap", uri);
                                 intent.putExtras(bundle);
                                 startActivity(intent);
-
                                 }
                         });
                         } else {
@@ -262,5 +259,4 @@ public class ResultFragment extends Fragment {
     protected synchronized void dismissDialog() {
         progressDialogFragment.dismissAllowingStateLoss();
     }
-
 }

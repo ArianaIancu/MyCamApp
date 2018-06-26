@@ -1,28 +1,31 @@
 package com.example.lorenai.mycamapp;
 
+import java.util.Map;
+import java.util.List;
+import java.util.HashMap;
+import java.util.ArrayList;
+
 import android.content.Context;
-import android.graphics.Canvas;
-import android.graphics.Paint;
-import android.graphics.PointF;
 import android.util.AttributeSet;
-import android.view.MotionEvent;
+import android.widget.ImageView;
+import android.widget.FrameLayout;
+import android.graphics.Paint;
+import android.graphics.Canvas;
+import android.graphics.PointF;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
-import android.widget.ImageView;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import android.view.MotionEvent;
 
 /**
  * Created by jhansi on 28/03/15.
  */
+
 public class PolygonView extends FrameLayout {
 
-    protected Context context;
     private Paint paint;
+    protected Context context;
+    private PolygonView polygonView;
+
     private ImageView pointer1;
     private ImageView pointer2;
     private ImageView pointer3;
@@ -31,7 +34,6 @@ public class PolygonView extends FrameLayout {
     private ImageView midPointer12;
     private ImageView midPointer34;
     private ImageView midPointer24;
-    private PolygonView polygonView;
 
     public PolygonView(Context context) {
         super(context);
@@ -98,7 +100,6 @@ public class PolygonView extends FrameLayout {
         points.add(new PointF(pointer2.getX(), pointer2.getY()));
         points.add(new PointF(pointer3.getX(), pointer3.getY()));
         points.add(new PointF(pointer4.getX(), pointer4.getY()));
-
         return getOrderedPoints(points);
     }
 
@@ -125,30 +126,6 @@ public class PolygonView extends FrameLayout {
         }
         return orderedPoints;
     }
-
-    /*
-    public void setPoints(Map<Integer, PointF> pointFMap) {
-        if (pointFMap.size() == 4) {
-            setPointsCoordinates(pointFMap);
-        }
-    }
-    */
-
-    /*
-    private void setPointsCoordinates(Map<Integer, PointF> pointFMap) {
-        pointer1.setX(pointFMap.get(0).x);
-        pointer1.setY(pointFMap.get(0).y);
-
-        pointer2.setX(pointFMap.get(1).x);
-        pointer2.setY(pointFMap.get(1).y);
-
-        pointer3.setX(pointFMap.get(2).x);
-        pointer3.setY(pointFMap.get(2).y);
-
-        pointer4.setX(pointFMap.get(3).x);
-        pointer4.setY(pointFMap.get(3).y);
-    }
-    */
 
     @Override
     protected void dispatchDraw(Canvas canvas) {
@@ -196,7 +173,6 @@ public class PolygonView extends FrameLayout {
             switch (eid) {
                 case MotionEvent.ACTION_MOVE:
                     PointF mv = new PointF(event.getX() - DownPT.x, event.getY() - DownPT.y);
-
                     if (Math.abs(mainPointer1.getX() - mainPointer2.getX()) > Math.abs(mainPointer1.getY() - mainPointer2.getY())) {
                         if (((mainPointer2.getY() + mv.y + v.getHeight() < polygonView.getHeight()) && (mainPointer2.getY() + mv.y > 0))) {
                             v.setX((int) (StartPT.y + mv.y));
@@ -290,6 +266,4 @@ public class PolygonView extends FrameLayout {
         }
 
     }
-
-
 }

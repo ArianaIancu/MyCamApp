@@ -1,21 +1,20 @@
 package com.example.lorenai.mycamapp;
 
+import java.io.IOException;
+import java.io.ByteArrayOutputStream;
+
+import android.net.Uri;
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.net.Uri;
 import android.provider.MediaStore;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 
 /**
  * Created by jhansi on 05/04/15.
  */
+
 public class Util {
 
-    private Util() {
-
-    }
+    private Util() { }
 
     public static Uri getUri(Context context, Bitmap bitmap) {
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();

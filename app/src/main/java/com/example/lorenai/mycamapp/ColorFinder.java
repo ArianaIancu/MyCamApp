@@ -1,25 +1,25 @@
 package com.example.lorenai.mycamapp;
 
-import android.graphics.Bitmap;
-import android.media.MediaScannerConnection;
+import java.util.Date;
+import java.text.SimpleDateFormat;
+import java.io.File;
+import java.io.IOException;
+import java.io.FileOutputStream;
+
 import android.net.Uri;
-import android.os.AsyncTask;
-import android.os.Environment;
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.support.v7.graphics.Palette;
 import android.util.Log;
 import android.view.View;
+import android.graphics.Bitmap;
+import android.media.MediaScannerConnection;
+import android.os.Bundle;
+import android.os.AsyncTask;
+import android.os.Environment;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import android.support.v7.graphics.Palette;
+import android.support.v7.app.AppCompatActivity;
 
 public class ColorFinder extends AppCompatActivity {
 

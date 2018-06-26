@@ -1,13 +1,13 @@
 package com.example.lorenai.mycamapp;
 
+import android.os.Bundle;
+import android.view.KeyEvent;
 import android.annotation.SuppressLint;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnKeyListener;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.app.ProgressDialog;
-import android.content.DialogInterface;
-import android.content.DialogInterface.OnKeyListener;
-import android.os.Bundle;
-import android.view.KeyEvent;
 
 @SuppressLint("ValidFragment")
 public class ProgressDialogFragment extends DialogFragment {
