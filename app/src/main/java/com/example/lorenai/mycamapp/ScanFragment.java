@@ -131,7 +131,12 @@ public class ScanFragment extends Fragment implements CropImageView.OnSetImageUr
     private class ScanButtonClickListener implements View.OnClickListener {
         @Override
         public void onClick(View v) {
-            scanner.onScanFinish(savedUri);
+            if (original == null) {
+                Intent intent = new Intent(getContext(), MainActivity.class);
+                startActivity(intent);
+            } else {
+                scanner.onScanFinish(savedUri);
+            }
         }
     }
 }

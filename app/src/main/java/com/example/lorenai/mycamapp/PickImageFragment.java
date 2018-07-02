@@ -4,9 +4,11 @@ import java.io.File;
 import java.io.IOException;
 
 import android.net.Uri;
+import android.support.annotation.NonNull;
+import android.support.design.widget.BottomNavigationView;
 import android.util.Log;
 import android.os.Bundle;
-import android.widget.ImageButton;
+import android.view.MenuItem;
 import android.provider.MediaStore;
 import android.support.v4.content.FileProvider;
 import android.app.Activity;
@@ -23,14 +25,12 @@ import android.content.res.AssetFileDescriptor;
 /**
  * Created by jhansi on 04/04/15.
  */
+
 public class PickImageFragment extends Fragment {
 
     private View view;
     private Uri fileUri;
     private IScanner scanner;
-
-    private ImageButton cameraButton;
-    private ImageButton galleryButton;
 
     @Override
     public void onAttach(Activity activity) {
@@ -44,39 +44,38 @@ public class PickImageFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.pick_image_fragment, null);
-        init();
+        BottomNavigationView navigation = (BottomNavigationView) view.findViewById(R.id.navigation2);
+        navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+
+        handleIntentPreference();
         return view;
     }
 
-    private void init() {
-        cameraButton = (ImageButton) view.findViewById(R.id.cameraButton2);
-        cameraButton.setOnClickListener(new CameraButtonClickListener());
-        galleryButton = (ImageButton) view.findViewById(R.id.selectButton2);
-        galleryButton.setOnClickListener(new GalleryClickListener());
-
-        handleIntentPreference();
-    }
+    private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener = new BottomNavigationView.OnNavigationItemSelectedListener() {
+        @Override
+        public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+            switch (item.getItemId()) {
+                case R.id.galery:
+                    openMediaContent();
+                    return true;
+                case R.id.camera:
+                    Intent i = new Intent(getActivity(), MainActivity.class);
+                    startActivity(i);
+                    return true;
+                case R.id.settings:
+                    Intent sIntent = new Intent(getContext(), SettingsActivity.class);
+                    startActivity(sIntent);
+                    return true;
+            }
+            return false;
+        }
+    };
 
     private void handleIntentPreference() {
         int preference = getArguments().getInt("Gal");
         if (preference == ScanConstants.OPEN_CAMERA) {
             openCamera();
         } else if (preference == ScanConstants.OPEN_MEDIA) {
-            openMediaContent();
-        }
-    }
-
-    private class CameraButtonClickListener implements View.OnClickListener {
-        @Override
-        public void onClick(View v) {
-            Intent i = new Intent(getActivity(), MainActivity.class);
-            startActivity(i);
-        }
-    }
-
-    private class GalleryClickListener implements View.OnClickListener {
-        @Override
-        public void onClick(View view) {
             openMediaContent();
         }
     }
@@ -142,8 +141,7 @@ public class PickImageFragment extends Fragment {
     public Bitmap getBitmap(Uri selectedImg) throws IOException {
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inSampleSize = 3;
-        AssetFileDescriptor fileDescriptor = null;
-        fileDescriptor = getActivity().getContentResolver().openAssetFileDescriptor(selectedImg, "r");
+        AssetFileDescriptor fileDescriptor = getActivity().getContentResolver().openAssetFileDescriptor(selectedImg, "r");
         Bitmap original = BitmapFactory.decodeFileDescriptor(fileDescriptor.getFileDescriptor(), null, options);
         return original;
     }

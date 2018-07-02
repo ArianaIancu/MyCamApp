@@ -48,6 +48,7 @@ public class MainActivity extends AppCompatActivity implements IScanner, Compone
 
     public Button drive;
     private File mImageFolder;
+    public File photoFile;
     Bundle CODE_BUNDLE = new Bundle();
     public ImageView scannedImageView;
 
@@ -242,7 +243,6 @@ public class MainActivity extends AppCompatActivity implements IScanner, Compone
         Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if (cameraIntent.resolveActivity(getPackageManager()) != null) {
             // Create the File where the photo should go
-            File photoFile = null;
             try {
                 photoFile = createImageFileName();
             } catch (IOException ex) {
@@ -258,6 +258,20 @@ public class MainActivity extends AppCompatActivity implements IScanner, Compone
         }
     }
 
+    public  Bitmap uriToBitmap(Context c, Uri uri) {
+        if (c == null && uri == null) {
+            return null;
+        }
+        Bitmap mImageBitmap;
+        try {
+            mImageBitmap = MediaStore.Images.Media.getBitmap(c.getContentResolver(), FileProvider.getUriForFile(c, getPackageName() + ".my.package.name.provider", new File(uri.getPath())));
+            return mImageBitmap;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
             try {
@@ -265,9 +279,13 @@ public class MainActivity extends AppCompatActivity implements IScanner, Compone
                     Log.i(TAG, "Image successfully saved.");
                 }
                 if(requestCode == REQUEST_IMAGE_CAPTURE) {
-                    CODE_BUNDLE.putInt("Gal", 4);
-                    CODE_BUNDLE.putString("IMG", mCurrentPhotoPath);
-                    init();
+                    Bitmap bitmap = uriToBitmap(getApplicationContext() , Uri.parse(mCurrentPhotoPath));
+                    if(bitmap != null) {
+                        bitmap.recycle();
+                        CODE_BUNDLE.putInt("Gal", 4);
+                        CODE_BUNDLE.putString("IMG", mCurrentPhotoPath);
+                        init();
+                    }
                 }
             } catch (Exception e) {
                 e.printStackTrace();
