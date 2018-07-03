@@ -417,7 +417,8 @@ public class MainActivity extends AppCompatActivity implements IScanner, Compone
                 /**
 
                  Dupa ce te conectezi (press SAVE TO DRIVE), apasa pe CHANGE DRIVE ACCOUNT si alegi contul cu care esti deja conectat.
-                 Daca apesi butonul CHANGE DRIVE ACCOUNT imediat (fara sa dai pe SAVE TO DRIVE ), CRASH si eroarea urmatoare apare:
+                 Daca apesi butonul CHANGE DRIVE ACCOUNT imediat (fara sa dai pe SAVE TO DRIVE, daca faci asta atunci nu mai comenteaza cand dai iara pe CHANGE DRIVE ACCOUNT )
+                 , CRASH si eroarea urmatoare apare:
 
                  Caused by: java.lang.IllegalStateException: GoogleApiClient is not connected yet.
                  at com.example.lorenai.mycamapp.MainActivity.onClickChangeDrive(MainActivity.java:416)
