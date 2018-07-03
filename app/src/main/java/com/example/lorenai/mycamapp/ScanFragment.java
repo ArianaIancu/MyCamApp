@@ -139,5 +139,11 @@ public class ScanFragment extends Fragment implements CropImageView.OnSetImageUr
             }
         }
     }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+    }
+
 }
 

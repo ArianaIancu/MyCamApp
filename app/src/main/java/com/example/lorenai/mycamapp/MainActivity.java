@@ -16,7 +16,10 @@ import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.GoogleApiAvailability;
 
+import android.content.pm.ActivityInfo;
 import android.net.Uri;
+import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.Manifest;
 import android.provider.MediaStore;
@@ -43,6 +46,7 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.ComponentCallbacks2;
+import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity implements IScanner, ComponentCallbacks2, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
@@ -126,6 +130,7 @@ public class MainActivity extends AppCompatActivity implements IScanner, Compone
 
     @Override
     public void onBitmapSelect(Uri uri) {
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
         ScanFragment fragment = new ScanFragment();
         Bundle bundle = new Bundle();
         bundle.putParcelable(ScanConstants.SELECTED_BITMAP, uri);
@@ -306,7 +311,7 @@ public class MainActivity extends AppCompatActivity implements IScanner, Compone
     // GOOGLE DRIVE HERE
 
     public DriveFile file;
-    private GoogleApiClient mGoogleApiClient;
+    private GoogleApiClient mGoogleApiClient = null;
     private static final String TAG = "Google Drive Activity";
 
     private static final  int REQUEST_CODE_CREATOR = 2;
@@ -319,14 +324,13 @@ public class MainActivity extends AppCompatActivity implements IScanner, Compone
      */
 
     public void connectDude() {
-        if (mGoogleApiClient == null) {
+       if (mGoogleApiClient == null) {
 
             /**
              * Create the API client and bind it to an instance variable.
              * We use this instance as the callback for connection and connection failures.
              * Since no account name is passed, the user is prompted to choose.
              */
-
             mGoogleApiClient = new GoogleApiClient.Builder(getApplicationContext())
                     .addApi(Drive.API)
                     .addScope(Drive.SCOPE_FILE)
@@ -393,7 +397,36 @@ public class MainActivity extends AppCompatActivity implements IScanner, Compone
     }
 
     public void onClickChangeDrive(View view) {
-        mGoogleApiClient.clearDefaultAccountAndReconnect();
+        if (mGoogleApiClient == null) {
+            AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
+            alertDialog.setTitle("Can't change account");
+            alertDialog.setMessage("You are not yet connected with a Google Drive account.");
+            alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+            alertDialog.show();
+        } else {
+            if (mGoogleApiClient.isConnected()) {
+                mGoogleApiClient.clearDefaultAccountAndReconnect();
+            } else {
+                mGoogleApiClient.connect(); // NICI CU ASTA NU MERGE :(
+                mGoogleApiClient.clearDefaultAccountAndReconnect(); // PROBLEM HERE
+                /**
+
+                 Dupa ce te conectezi (press SAVE TO DRIVE), apasa pe CHANGE DRIVE ACCOUNT si alegi contul cu care esti deja conectat.
+                 Daca apesi butonul CHANGE DRIVE ACCOUNT imediat (fara sa dai pe SAVE TO DRIVE ), CRASH si eroarea urmatoare apare:
+
+                 Caused by: java.lang.IllegalStateException: GoogleApiClient is not connected yet.
+                 at com.example.lorenai.mycamapp.MainActivity.onClickChangeDrive(MainActivity.java:416)
+
+                 WHY?!?!?!?!?!?!!??!?!?!?!?!?!?!?!??!?!?!?!?!?!?
+
+                 */
+            }
+        }
     }
 
     /**

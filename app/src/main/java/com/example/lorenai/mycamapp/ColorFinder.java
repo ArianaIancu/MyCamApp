@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.FileOutputStream;
 
+import android.content.pm.ActivityInfo;
 import android.net.Uri;
 import android.util.Log;
 import android.view.View;
@@ -39,6 +40,7 @@ public class ColorFinder extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
         setContentView(R.layout.activity_color_finder);
 
         init();
@@ -56,7 +58,7 @@ public class ColorFinder extends AppCompatActivity {
 
         createImageFolder();
 
-        Palette.from(original).generate(new Palette.PaletteAsyncListener() {   // DELETE IT HERE. MOVE IT IN NEY LAYOUT
+        Palette.from(original).generate(new Palette.PaletteAsyncListener() {
             public void onGenerated(Palette palette) {
                 Palette.Swatch vibrantSwatch = palette.getVibrantSwatch();
                 if (vibrantSwatch != null) {
@@ -147,5 +149,10 @@ public class ColorFinder extends AppCompatActivity {
                         Log.i("ExternalStorage", "-> uri=" + uri);
                     }
                 });
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
     }
 }
