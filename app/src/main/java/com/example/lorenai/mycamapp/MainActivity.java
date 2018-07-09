@@ -18,8 +18,6 @@ import com.google.android.gms.common.GoogleApiAvailability;
 
 import android.content.pm.ActivityInfo;
 import android.net.Uri;
-import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.Manifest;
 import android.provider.MediaStore;
@@ -46,7 +44,6 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.ComponentCallbacks2;
-import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity implements IScanner, ComponentCallbacks2, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
@@ -311,7 +308,7 @@ public class MainActivity extends AppCompatActivity implements IScanner, Compone
     // GOOGLE DRIVE HERE
 
     public DriveFile file;
-    private GoogleApiClient mGoogleApiClient = null;
+    private GoogleApiClient mGoogleApiClient;
     private static final String TAG = "Google Drive Activity";
 
     private static final  int REQUEST_CODE_CREATOR = 2;
@@ -324,20 +321,21 @@ public class MainActivity extends AppCompatActivity implements IScanner, Compone
      */
 
     public void connectDude() {
-       if (mGoogleApiClient == null) {
+        if (mGoogleApiClient == null) {
 
             /**
              * Create the API client and bind it to an instance variable.
              * We use this instance as the callback for connection and connection failures.
              * Since no account name is passed, the user is prompted to choose.
              */
+
             mGoogleApiClient = new GoogleApiClient.Builder(getApplicationContext())
                     .addApi(Drive.API)
                     .addScope(Drive.SCOPE_FILE)
                     .addConnectionCallbacks(this)
                     .addOnConnectionFailedListener(this)
                     .build();
-        }
+                }
         mGoogleApiClient.connect();
     }
 
@@ -392,15 +390,18 @@ public class MainActivity extends AppCompatActivity implements IScanner, Compone
     }
 
     public void onClickCreateFile(View view){
-        connectDude();
-        saveFileToDrive();
-    }
-
-    public void onClickChangeDrive(View view) {
-        if (mGoogleApiClient == null) {
+        if (mGoogleApiClient != null) {
+            if (mGoogleApiClient.isConnected()) {
+                saveFileToDrive();
+            }
+            else {
+                connectDude();
+                saveFileToDrive();
+            }
+        } else {
             AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
-            alertDialog.setTitle("Can't change account");
-            alertDialog.setMessage("You are not yet connected with a Google Drive account.");
+            alertDialog.setTitle("Can't connect");
+            alertDialog.setMessage("You are not connected with a Google Drive account.");
             alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
                     new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int which) {
@@ -408,27 +409,9 @@ public class MainActivity extends AppCompatActivity implements IScanner, Compone
                         }
                     });
             alertDialog.show();
-        } else {
-            if (mGoogleApiClient.isConnected()) {
-                mGoogleApiClient.clearDefaultAccountAndReconnect();
-            } else {
-                mGoogleApiClient.connect(); // NICI CU ASTA NU MERGE :(
-                mGoogleApiClient.clearDefaultAccountAndReconnect(); // PROBLEM HERE
-                /**
-
-                 Dupa ce te conectezi (press SAVE TO DRIVE), apasa pe CHANGE DRIVE ACCOUNT si alegi contul cu care esti deja conectat.
-                 Daca apesi butonul CHANGE DRIVE ACCOUNT imediat (fara sa dai pe SAVE TO DRIVE, daca faci asta atunci nu mai comenteaza cand dai iara pe CHANGE DRIVE ACCOUNT )
-                 , CRASH si eroarea urmatoare apare:
-
-                 Caused by: java.lang.IllegalStateException: GoogleApiClient is not connected yet.
-                 at com.example.lorenai.mycamapp.MainActivity.onClickChangeDrive(MainActivity.java:416)
-
-                 WHY?!?!?!?!?!?!!??!?!?!?!?!?!?!?!??!?!?!?!?!?!?
-
-                 */
-            }
         }
     }
+
 
     /**
      *  Saves the bitmap to drive, can choose the name and folder in Google Drive
@@ -441,7 +424,6 @@ public class MainActivity extends AppCompatActivity implements IScanner, Compone
         final Bitmap image = ((BitmapDrawable)scannedImageView.getDrawable()).getBitmap();
         Drive.DriveApi.newDriveContents(mGoogleApiClient)
                 .setResultCallback(new ResultCallback<DriveApi.DriveContentsResult>() {
-
                     @Override
                     public void onResult(DriveApi.DriveContentsResult result) {
                         // If the operation was not successful, we cannot do anything
@@ -465,8 +447,7 @@ public class MainActivity extends AppCompatActivity implements IScanner, Compone
                         }
                         // Create the initial metadata - MIME type and title.
                         // Note that the user will be able to change the title later.
-                        MetadataChangeSet metadataChangeSet = new MetadataChangeSet.Builder()
-                                .setMimeType("image/jpeg").setTitle("Android Photo.png").build();
+                        MetadataChangeSet metadataChangeSet = new MetadataChangeSet.Builder().setMimeType("image/jpeg").setTitle("Android Photo.png").build();
                         // Create an intent for the file chooser, and start it.
                         IntentSender intentSender = Drive.DriveApi
                                 .newCreateFileActivityBuilder()
@@ -474,8 +455,7 @@ public class MainActivity extends AppCompatActivity implements IScanner, Compone
                                 .setInitialDriveContents(result.getDriveContents())
                                 .build(mGoogleApiClient);
                         try {
-                            startIntentSenderForResult(
-                                    intentSender, REQUEST_CODE_CREATOR, null, 0, 0, 0);
+                            startIntentSenderForResult(intentSender, REQUEST_CODE_CREATOR, null, 0, 0, 0);
                         } catch (IntentSender.SendIntentException e) {
                             Log.i(TAG, "Failed to launch file chooser.");
                         }
