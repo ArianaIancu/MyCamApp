@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.ByteArrayOutputStream;
 
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.drive.Drive;
 import com.google.android.gms.drive.DriveApi;
 import com.google.android.gms.drive.DriveFile;
@@ -44,6 +45,7 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.ComponentCallbacks2;
+import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity implements IScanner, ComponentCallbacks2, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
@@ -55,6 +57,7 @@ public class MainActivity extends AppCompatActivity implements IScanner, Compone
 
     public int PERMISSION_ALL = 1;
     static final int REQUEST_IMAGE_CAPTURE = 1;
+    private static String drive_email;
 
     private String mCurrentPhotoPath;
     public String[] PERMISSIONS = {Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE};
@@ -97,9 +100,10 @@ public class MainActivity extends AppCompatActivity implements IScanner, Compone
         //navigation.setSelectedItemId(R.id.camera);
 
         PreferenceManager.setDefaultValues(this, R.xml.pref_general, false);
-
+        PreferenceManager.setDefaultValues(this, R.xml.pref_drive, false);
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         ScanConstants.FOLDER_NAME = preferences.getString("folder_name"," ");
+        drive_email = preferences.getString("drive_email", " ");
 
     }
 
@@ -314,28 +318,15 @@ public class MainActivity extends AppCompatActivity implements IScanner, Compone
     private static final  int REQUEST_CODE_CREATOR = 2;
     private static final int REQUEST_CODE_RESOLUTION = 3;
 
-    /**
-     * Called when the activity will start interacting with the user.
-     * At this point your activity is at the top of the activity stack,
-     * with user input going to it.
-     */
-
     public void connectDude() {
         if (mGoogleApiClient == null) {
-
-            /**
-             * Create the API client and bind it to an instance variable.
-             * We use this instance as the callback for connection and connection failures.
-             * Since no account name is passed, the user is prompted to choose.
-             */
-
             mGoogleApiClient = new GoogleApiClient.Builder(getApplicationContext())
                     .addApi(Drive.API)
+                    .setAccountName(drive_email).addConnectionCallbacks(this)
                     .addScope(Drive.SCOPE_FILE)
-                    .addConnectionCallbacks(this)
                     .addOnConnectionFailedListener(this)
                     .build();
-                }
+        }
         mGoogleApiClient.connect();
     }
 
@@ -358,12 +349,6 @@ public class MainActivity extends AppCompatActivity implements IScanner, Compone
             return;
         }
 
-        /**
-         *  The failure has a resolution. Resolve it.
-         *  Called typically when the app is not yet authorized, and an  authorization
-         *  dialog is displayed to the user.
-         */
-
         try {
             result.startResolutionForResult(this, REQUEST_CODE_RESOLUTION);
         } catch (IntentSender.SendIntentException e) {
@@ -371,18 +356,8 @@ public class MainActivity extends AppCompatActivity implements IScanner, Compone
         }
     }
 
-    /**
-     * It invoked when Google API client connected
-     * @param connectionHint
-     */
-
     @Override
     public void onConnected(Bundle connectionHint) { }
-
-    /**
-     * It invoked when connection suspend
-     * @param cause
-     */
 
     @Override
     public void onConnectionSuspended(int cause) {
@@ -390,15 +365,9 @@ public class MainActivity extends AppCompatActivity implements IScanner, Compone
     }
 
     public void onClickCreateFile(View view){
-        if (mGoogleApiClient != null) {
-            if (mGoogleApiClient.isConnected()) {
-                saveFileToDrive();
-            }
-            else {
-                connectDude();
-                saveFileToDrive();
-            }
-        } else {
+        connectDude();
+        saveFileToDrive();
+            /*
             AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
             alertDialog.setTitle("Can't connect");
             alertDialog.setMessage("You are not connected with a Google Drive account.");
@@ -409,13 +378,8 @@ public class MainActivity extends AppCompatActivity implements IScanner, Compone
                         }
                     });
             alertDialog.show();
+            */
         }
-    }
-
-
-    /**
-     *  Saves the bitmap to drive, can choose the name and folder in Google Drive
-     */
 
     private void saveFileToDrive() {
         // Start by creating a new contents, and setting a callback.

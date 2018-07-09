@@ -1,0 +1,13 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <EditTextPreference
+        android:capitalize="words"
+        android:inputType="textCapWords"
+        android:key="drive_email"
+        android:maxLines="1"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:title="@string/title_drive_email" />
+     <!--  android:defaultValue="@string/drive_default" -->
+
+</PreferenceScreen>

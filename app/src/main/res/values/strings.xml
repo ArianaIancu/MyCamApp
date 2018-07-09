@@ -22,4 +22,9 @@
     <string name="pref_title_social_recommendations">Enable color finder</string>
     <string name="pref_description_social_recommendations">After editing, detect the main color from your image</string>
 
+    <!-- Drive Settings -->
+    <string name="pref_header_drive">Google Drive</string>
+    <string name="drive_default"> None </string>
+    <string name="title_drive_email"> Google Drive Email </string>
+
 </resources>
