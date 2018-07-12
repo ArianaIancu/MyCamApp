@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.ByteArrayOutputStream;
 
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.drive.Drive;
 import com.google.android.gms.drive.DriveApi;
 import com.google.android.gms.drive.DriveFile;
@@ -67,6 +66,8 @@ public class MainActivity extends AppCompatActivity implements IScanner, Compone
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
+
         final SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         boolean agreed = sharedPreferences.getBoolean("agreed",false);
         if (!agreed) {
@@ -109,6 +110,7 @@ public class MainActivity extends AppCompatActivity implements IScanner, Compone
 
     private void init() {
         setContentView(R.layout.scan_layout);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
         PickImageFragment fragment = new PickImageFragment(); //here is where it starts to select an img
         fragment.setArguments(CODE_BUNDLE);
 
@@ -146,6 +148,7 @@ public class MainActivity extends AppCompatActivity implements IScanner, Compone
 
     @Override
     public void onScanFinish(Uri uri) {
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
         ResultFragment fragment = new ResultFragment();
         Bundle bundle = new Bundle();
         bundle.putParcelable(ScanConstants.SCANNED_RESULT, uri);
@@ -364,7 +367,7 @@ public class MainActivity extends AppCompatActivity implements IScanner, Compone
         Log.i(TAG, "GoogleApiClient connection suspended");
     }
 
-    public void onClickCreateFile(View view){
+    public void onClickCreateFile(View view) {
         connectDude();
         saveFileToDrive();
             /*

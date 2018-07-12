@@ -24,15 +24,19 @@ import android.support.v7.app.AppCompatActivity;
 
 public class ColorFinder extends AppCompatActivity {
 
+    private Bitmap original;
     public RelativeLayout outerLayout;
     public TextView titleText;
     public TextView bodyText;
     private ImageView scannedImageView;
     private Button doneButton;
-    private Bitmap original;
+    private Button saveColorDrive;
 
-    private File mImageFolderB;
-    private File mImageFolderG;
+    private File mImageFolderB; // albastru
+    private File mImageFolderG; // verde
+    private File mImageFolderR; // rosu
+    private File mImageFolderYO; // galben + portocaliu
+    private File mImageFolderPP; //purple pink
 
     static public float[] color ;
     static public String colorName;
@@ -40,8 +44,8 @@ public class ColorFinder extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
         setContentView(R.layout.activity_color_finder);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
 
         init();
     }
@@ -53,7 +57,10 @@ public class ColorFinder extends AppCompatActivity {
         scannedImageView = (ImageView) findViewById(R.id.theImage);
         doneButton = (Button) findViewById(R.id.saveButton);
         doneButton.setOnClickListener(new ColorFinder.SaveButtonClickListener());
+        saveColorDrive = (Button) findViewById(R.id.saveColorDrive);
+        saveColorDrive.setOnClickListener(new ColorFinder.SaveDriveClickListener());
         original = getBitmap();
+
         scannedImageView.setImageBitmap(original);
 
         createImageFolder();
@@ -67,15 +74,27 @@ public class ColorFinder extends AppCompatActivity {
                     titleText.setTextColor(vibrantSwatch.getTitleTextColor());
                     bodyText.setTextColor(vibrantSwatch.getBodyTextColor());
 
-                    if (color[0] >= 63 && color[0] <= 179) { // GREEN *APROXIMATIV PLS THERE ARE A LOT OF THEM I TRIED*
+                    if (color[0] >= 63 && color[0] <= 179) { // Green
                         bodyText.setText("Green");
                         colorName = "Green";
-                    } else if (color[0] > 179 && color[0] <= 252)  { // BLUE *APROXIMATIV*
+                    } else if (color[0] >= 180 && color[0] <= 252) { // Blue
                         bodyText.setText("Blue");
                         colorName = "Blue";
-                    } else {                                       // EVERYTHING ELSE
-                        bodyText.setText("Not Green/Blue");
-                        colorName = "Not Green/Blue";
+                    } else if (color[0] >= 0  && color[0] <= 11) { // Red Ver. 1
+                        bodyText.setText("Red");
+                        colorName = "Red";
+                    } else if (color[0] >= 353 && color[0] <= 360) {  // Red Ver. 2
+                        bodyText.setText("Red");
+                        colorName = "Red";
+                    } else if (color[0] >= 12 && color[0] <= 62 ) { // Yellow&Orange
+                        bodyText.setText("Yellow/Orange");
+                        colorName = "Yellow/Orange";
+                    } else if (color[0] > 252 && color[0] <= 352) { // Purple&Pink
+                        bodyText.setText("Purple/Pink");
+                        colorName = "Purple/Pink";
+                    } else { // Everything else
+                        bodyText.setText("No color found");
+                        colorName = "No color found";
                     }
                 }
             }
@@ -101,11 +120,20 @@ public class ColorFinder extends AppCompatActivity {
                 @Override
                 public void run() {
                     try {
+                        if (colorName == "Red") {
+                            createImageFileName(original, mImageFolderR);
+                        }
                         if (colorName == "Green") {
                             createImageFileName(original, mImageFolderG);
                         }
                         if (colorName == "Blue") {
                             createImageFileName(original, mImageFolderB);
+                        }
+                        if (colorName == "Yellow/Orange") {
+                            createImageFileName(original, mImageFolderYO);
+                        }
+                        if (colorName == "Purple/Pink") {
+                            createImageFileName(original, mImageFolderPP);
                         }
                         original.recycle();
                         System.gc();
@@ -118,14 +146,49 @@ public class ColorFinder extends AppCompatActivity {
         }
     }
 
+    public void createDrive() {
+
+    }
+
+    private class SaveDriveClickListener implements View.OnClickListener {
+        @Override
+        public void onClick(View v) {
+            AsyncTask.execute(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        original.recycle();
+                        System.gc();
+                        finish();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+        }
+    }
+
     private void createImageFolder() {
+        mImageFolderR = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),"MyCamAppRed");
         mImageFolderB = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),"MyCamAppBlue");
         mImageFolderG = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),"MyCamAppGreen");
+        mImageFolderYO = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),"MyCamAppYellow&Orange");
+        mImageFolderPP = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),"MyCamAppPurple&Pink");
+
         if (!mImageFolderB.exists()) {
             mImageFolderB.mkdir();
         }
         if (!mImageFolderG.exists()) {
             mImageFolderG.mkdir();
+        }
+        if (!mImageFolderR.exists()) {
+            mImageFolderR.mkdir();
+        }
+        if (!mImageFolderYO.exists()) {
+            mImageFolderYO.mkdir();
+        }
+        if (!mImageFolderPP.exists()) {
+            mImageFolderB.mkdir();
         }
     }
 
