@@ -26,5 +26,6 @@
     <string name="pref_header_drive">Google Drive</string>
     <string name="drive_default"> None </string>
     <string name="title_drive_email"> Google Drive Email </string>
+    <string name="drive_email_description"> Restart app after changing the email </string>
 
 </resources>
