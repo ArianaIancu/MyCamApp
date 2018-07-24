@@ -72,8 +72,8 @@
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
             android:layout_marginEnd="13dp"
-            android:text="Not Green/Blue"
             android:textColor="@color/black"
+            android:text="No color found"
             android:textSize="24dp" />
 
     </RelativeLayout>

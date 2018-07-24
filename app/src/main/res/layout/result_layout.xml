@@ -96,7 +96,7 @@
         android:layout_height="wrap_content"
         android:layout_above="@+id/doneButton"
         android:layout_alignParentEnd="true"
-        android:text="Save to Drive"
-        android:onClick="onClickCreateFile"/>
+        android:onClick="onClickCreateFile"
+        android:text="Save to Drive" />
 
 </RelativeLayout>

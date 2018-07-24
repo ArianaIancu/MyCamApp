@@ -1,13 +1,19 @@
 package com.example.lorenai.mycamapp;
 
+import java.io.ByteArrayOutputStream;
+import java.io.OutputStream;
 import java.util.Date;
 import java.text.SimpleDateFormat;
 import java.io.File;
 import java.io.IOException;
 import java.io.FileOutputStream;
 
+import android.content.IntentSender;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
 import android.graphics.Bitmap;
@@ -22,7 +28,16 @@ import android.widget.RelativeLayout;
 import android.support.v7.graphics.Palette;
 import android.support.v7.app.AppCompatActivity;
 
-public class ColorFinder extends AppCompatActivity {
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.drive.Drive;
+import com.google.android.gms.drive.DriveApi;
+import com.google.android.gms.drive.DriveFile;
+import com.google.android.gms.drive.MetadataChangeSet;
+
+public class ColorFinder extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener  {
 
     private Bitmap original;
     public RelativeLayout outerLayout;
@@ -31,12 +46,14 @@ public class ColorFinder extends AppCompatActivity {
     private ImageView scannedImageView;
     private Button doneButton;
     private Button saveColorDrive;
+    private static String drive_email;
 
     private File mImageFolderB; // albastru
     private File mImageFolderG; // verde
     private File mImageFolderR; // rosu
     private File mImageFolderYO; // galben + portocaliu
     private File mImageFolderPP; //purple pink
+    private File mImageFolder; // everything else
 
     static public float[] color ;
     static public String colorName;
@@ -62,6 +79,11 @@ public class ColorFinder extends AppCompatActivity {
         original = getBitmap();
 
         scannedImageView.setImageBitmap(original);
+
+        PreferenceManager.setDefaultValues(this, R.xml.pref_general, false);
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        ScanConstants.FOLDER_NAME = preferences.getString("folder_name"," ");
+        drive_email = preferences.getString("drive_email", " ");
 
         createImageFolder();
 
@@ -92,9 +114,8 @@ public class ColorFinder extends AppCompatActivity {
                     } else if (color[0] > 252 && color[0] <= 352) { // Purple&Pink
                         bodyText.setText("Purple/Pink");
                         colorName = "Purple/Pink";
-                    } else { // Everything else
-                        bodyText.setText("No color found");
-                        colorName = "No color found";
+                    } else {
+                        colorName= "NoColorFound";
                     }
                 }
             }
@@ -102,7 +123,7 @@ public class ColorFinder extends AppCompatActivity {
     }
 
     private Bitmap getBitmap() {
-        Uri uri = getIntent().getExtras().getParcelable("bitmap");;
+        Uri uri = getIntent().getExtras().getParcelable("bitmap");
         try {
             original = Util.getBitmap(this, uri);
             this.getContentResolver().delete(uri, null, null);
@@ -122,18 +143,16 @@ public class ColorFinder extends AppCompatActivity {
                     try {
                         if (colorName == "Red") {
                             createImageFileName(original, mImageFolderR);
-                        }
-                        if (colorName == "Green") {
+                        } else if (colorName == "Green") {
                             createImageFileName(original, mImageFolderG);
-                        }
-                        if (colorName == "Blue") {
+                        } else if (colorName == "Blue") {
                             createImageFileName(original, mImageFolderB);
-                        }
-                        if (colorName == "Yellow/Orange") {
+                        } else if (colorName == "Yellow/Orange") {
                             createImageFileName(original, mImageFolderYO);
-                        }
-                        if (colorName == "Purple/Pink") {
+                        } else if (colorName == "Purple/Pink") {
                             createImageFileName(original, mImageFolderPP);
+                        } else {
+                            createImageFileName(original, mImageFolder);
                         }
                         original.recycle();
                         System.gc();
@@ -146,23 +165,13 @@ public class ColorFinder extends AppCompatActivity {
         }
     }
 
-    public void createDrive() {
-
-    }
-
     private class SaveDriveClickListener implements View.OnClickListener {
         @Override
         public void onClick(View v) {
             AsyncTask.execute(new Runnable() {
                 @Override
                 public void run() {
-                    try {
-                        original.recycle();
-                        System.gc();
-                        finish();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+                    createFile();
                 }
             });
         }
@@ -174,7 +183,11 @@ public class ColorFinder extends AppCompatActivity {
         mImageFolderG = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),"MyCamAppGreen");
         mImageFolderYO = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),"MyCamAppYellow&Orange");
         mImageFolderPP = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),"MyCamAppPurple&Pink");
+        mImageFolder = new java.io.File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),ScanConstants.FOLDER_NAME);
 
+        if (!mImageFolder.exists()) {
+            mImageFolder.mkdir();
+        }
         if (!mImageFolderB.exists()) {
             mImageFolderB.mkdir();
         }
@@ -188,7 +201,7 @@ public class ColorFinder extends AppCompatActivity {
             mImageFolderYO.mkdir();
         }
         if (!mImageFolderPP.exists()) {
-            mImageFolderB.mkdir();
+            mImageFolderPP.mkdir();
         }
     }
 
@@ -218,4 +231,125 @@ public class ColorFinder extends AppCompatActivity {
     public void onResume() {
         super.onResume();
     }
+
+    // GOOGLE DRIVE HERE
+
+    public DriveFile file;
+    private GoogleApiClient mGoogleApiClient;
+    private static final String TAG = "Google Drive Activity";
+
+    private static final  int REQUEST_CODE_CREATOR = 2;
+    private static final int REQUEST_CODE_RESOLUTION = 3;
+
+
+    public void connectDude() {
+        if (mGoogleApiClient == null) {
+            mGoogleApiClient = new GoogleApiClient.Builder(getApplicationContext())
+                    .addApi(Drive.API)
+                    .setAccountName(drive_email)
+                    .addConnectionCallbacks(this)
+                    .addScope(Drive.SCOPE_FILE)
+                    .addOnConnectionFailedListener(this)
+                    .build();
+        }
+        mGoogleApiClient.connect();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (mGoogleApiClient != null) {
+            mGoogleApiClient.disconnect();
+        }
+        super.onPause();
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult result) {
+        // Called whenever the API client fails to connect.
+        Log.i(TAG, "GoogleApiClient connection failed: " + result.toString());
+        if (!result.hasResolution()) {
+            // show the localized error dialog.
+            GoogleApiAvailability.getInstance().getErrorDialog(this, result.getErrorCode(), 0).show();
+            return;
+        }
+
+        try {
+            result.startResolutionForResult(this, REQUEST_CODE_RESOLUTION);
+        } catch (IntentSender.SendIntentException e) {
+            Log.e(TAG, "Exception while starting resolution activity", e);
+        }
+    }
+
+    @Override
+    public void onConnected(Bundle connectionHint) { }
+
+    @Override
+    public void onConnectionSuspended(int cause) {
+        Log.i(TAG, "GoogleApiClient connection suspended");
+    }
+
+    public void createFile() {
+        connectDude();
+        saveFileToDrive();
+       /*
+            AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
+            alertDialog.setTitle("Can't connect");
+            alertDialog.setMessage("You are not connected with a Google Drive account.");
+            alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+            alertDialog.show();
+     */
+    }
+
+    private void saveFileToDrive() {
+        // Start by creating a new contents, and setting a callback.
+        Log.i(TAG, "Creating new contents.");
+        final Bitmap image = ((BitmapDrawable)scannedImageView.getDrawable()).getBitmap();
+        Drive.DriveApi.newDriveContents(mGoogleApiClient)
+                .setResultCallback(new ResultCallback<DriveApi.DriveContentsResult>() {
+                    @Override
+                    public void onResult(DriveApi.DriveContentsResult result) {
+                        // If the operation was not successful, we cannot do anything
+                        // and must
+                        // fail.
+                        if (!result.getStatus().isSuccess()) {
+                            Log.i(TAG, "Failed to create new contents.");
+                            return;
+                        }
+                        // Otherwise, we can write our data to the new contents.
+                        Log.i(TAG, "New contents created.");
+                        // Get an output stream for the contents.
+                        OutputStream outputStream = result.getDriveContents().getOutputStream();
+                        // Write the bitmap data from it.
+                        ByteArrayOutputStream bitmapStream = new ByteArrayOutputStream();
+                        image.compress(Bitmap.CompressFormat.PNG, 100, bitmapStream);
+                        try {
+                            outputStream.write(bitmapStream.toByteArray());
+                        } catch (IOException e1) {
+                            Log.i(TAG, "Unable to write file contents.");
+                        }
+                        // Create the initial metadata - MIME type and title.
+                        // Note that the user will be able to change the title later.
+                        MetadataChangeSet metaData = new MetadataChangeSet.Builder().setMimeType("application/vnd.google-apps.folder").setTitle("MyCamApp").build();
+                        MetadataChangeSet metadataChangeSet = new MetadataChangeSet.Builder().setMimeType("image/jpeg").setTitle("Android Photo.png").build();
+                        // Create an intent for the file chooser, and start it.
+                        IntentSender intentSender = Drive.DriveApi
+                                .newCreateFileActivityBuilder()
+                                .setInitialMetadata(metadataChangeSet)
+                                .setInitialDriveContents(result.getDriveContents())
+                                .build(mGoogleApiClient);
+                        try {
+                            startIntentSenderForResult(intentSender, REQUEST_CODE_CREATOR, null, 0, 0, 0);
+                        } catch (IntentSender.SendIntentException e) {
+                            Log.i(TAG, "Failed to launch file chooser.");
+                        }
+                    }
+                });
+    }
+
 }

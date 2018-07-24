@@ -1,11 +1,10 @@
 package com.example.lorenai.mycamapp;
 
+import java.io.ByteArrayOutputStream;
+import java.io.OutputStream;
 import java.util.Date;
 import java.text.SimpleDateFormat;
-import java.io.File;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.ByteArrayOutputStream;
 
 import com.google.android.gms.drive.Drive;
 import com.google.android.gms.drive.DriveApi;
@@ -16,7 +15,9 @@ import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.GoogleApiAvailability;
 
+import android.content.IntentSender;
 import android.content.pm.ActivityInfo;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.util.Log;
 import android.Manifest;
@@ -24,14 +25,12 @@ import android.provider.MediaStore;
 import android.preference.PreferenceManager;
 import android.os.Bundle;
 import android.os.Environment;
-import android.view.View;
 import android.view.MenuItem;
-import android.widget.Button;
+import android.view.View;
 import android.widget.ImageView;
 import android.app.AlertDialog;
 import android.app.FragmentTransaction;
 import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.ActivityCompat;
@@ -39,18 +38,15 @@ import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentSender;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.ComponentCallbacks2;
-import android.widget.TextView;
 
-public class MainActivity extends AppCompatActivity implements IScanner, ComponentCallbacks2, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+public class MainActivity extends AppCompatActivity implements IScanner, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
-    public Button drive;
-    private File mImageFolder;
-    public File photoFile;
+    private java.io.File mImageFolder;
+    public java.io.File photoFile;
     Bundle CODE_BUNDLE = new Bundle();
     public ImageView scannedImageView;
 
@@ -59,7 +55,7 @@ public class MainActivity extends AppCompatActivity implements IScanner, Compone
     private static String drive_email;
 
     private String mCurrentPhotoPath;
-    public String[] PERMISSIONS = {Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE};
+    public String[] PERMISSIONS = {Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.INTERNET};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,7 +90,7 @@ public class MainActivity extends AppCompatActivity implements IScanner, Compone
             ActivityCompat.requestPermissions(this, PERMISSIONS, PERMISSION_ALL);
         }
 
-        drive = (Button) findViewById(R.id.drive_button);
+        //drive = (Button) findViewById(R.id.drive_button);
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
@@ -212,18 +208,18 @@ public class MainActivity extends AppCompatActivity implements IScanner, Compone
     }
 
     private void createImageFolder() {
-        mImageFolder = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),ScanConstants.FOLDER_NAME);
+        mImageFolder = new java.io.File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),ScanConstants.FOLDER_NAME);
         if (!mImageFolder.exists()) {
             mImageFolder.mkdir();
         }
     }
 
-    private File createImageFileName() throws IOException {
+    private java.io.File createImageFileName() throws IOException {
         createImageFolder();
 
         String timestamp = new SimpleDateFormat("yyyyMMdd HHmmss").format(new Date());
         String prepend = "IMAGE" + timestamp + "_";
-        File imageFile = File.createTempFile(prepend, ".jpg", mImageFolder);
+        java.io.File imageFile = java.io.File.createTempFile(prepend, ".jpg", mImageFolder);
         mCurrentPhotoPath = imageFile.getAbsolutePath();
         return imageFile;
     }
@@ -273,7 +269,7 @@ public class MainActivity extends AppCompatActivity implements IScanner, Compone
         }
         Bitmap mImageBitmap;
         try {
-            mImageBitmap = MediaStore.Images.Media.getBitmap(c.getContentResolver(), FileProvider.getUriForFile(c, getPackageName() + ".my.package.name.provider", new File(uri.getPath())));
+            mImageBitmap = MediaStore.Images.Media.getBitmap(c.getContentResolver(), FileProvider.getUriForFile(c, getPackageName() + ".my.package.name.provider", new java.io.File(uri.getPath())));
             return mImageBitmap;
         } catch (IOException e) {
             e.printStackTrace();
@@ -283,10 +279,13 @@ public class MainActivity extends AppCompatActivity implements IScanner, Compone
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
             try {
+                /*
                 if(requestCode == REQUEST_CODE_CREATOR) {
                     Log.i(TAG, "Image successfully saved.");
                 }
+                */
                 if(requestCode == REQUEST_IMAGE_CAPTURE) {
                     Bitmap bitmap = uriToBitmap(getApplicationContext() , Uri.parse(mCurrentPhotoPath));
                     if(bitmap != null) {
@@ -301,7 +300,7 @@ public class MainActivity extends AppCompatActivity implements IScanner, Compone
             }
     }
 
-    private void addPicToGallery(Uri uri, File imageFile) {
+    private void addPicToGallery(Uri uri, java.io.File imageFile) {
         Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, uri);
         mediaScanIntent.setData(Uri.fromFile(imageFile));
         sendBroadcast(mediaScanIntent);
@@ -321,11 +320,13 @@ public class MainActivity extends AppCompatActivity implements IScanner, Compone
     private static final  int REQUEST_CODE_CREATOR = 2;
     private static final int REQUEST_CODE_RESOLUTION = 3;
 
+
     public void connectDude() {
         if (mGoogleApiClient == null) {
             mGoogleApiClient = new GoogleApiClient.Builder(getApplicationContext())
                     .addApi(Drive.API)
-                    .setAccountName(drive_email).addConnectionCallbacks(this)
+                    .setAccountName(drive_email)
+                    .addConnectionCallbacks(this)
                     .addScope(Drive.SCOPE_FILE)
                     .addOnConnectionFailedListener(this)
                     .build();
@@ -368,9 +369,9 @@ public class MainActivity extends AppCompatActivity implements IScanner, Compone
     }
 
     public void onClickCreateFile(View view) {
-        connectDude();
-        saveFileToDrive();
-            /*
+       connectDude();
+       saveFileToDrive();
+       /*
             AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
             alertDialog.setTitle("Can't connect");
             alertDialog.setMessage("You are not connected with a Google Drive account.");
@@ -381,8 +382,8 @@ public class MainActivity extends AppCompatActivity implements IScanner, Compone
                         }
                     });
             alertDialog.show();
-            */
-        }
+     */
+    }
 
     private void saveFileToDrive() {
         // Start by creating a new contents, and setting a callback.
@@ -414,6 +415,7 @@ public class MainActivity extends AppCompatActivity implements IScanner, Compone
                         }
                         // Create the initial metadata - MIME type and title.
                         // Note that the user will be able to change the title later.
+                        MetadataChangeSet metaData = new MetadataChangeSet.Builder().setMimeType("application/vnd.google-apps.folder").setTitle("MyCamApp").build();
                         MetadataChangeSet metadataChangeSet = new MetadataChangeSet.Builder().setMimeType("image/jpeg").setTitle("Android Photo.png").build();
                         // Create an intent for the file chooser, and start it.
                         IntentSender intentSender = Drive.DriveApi
