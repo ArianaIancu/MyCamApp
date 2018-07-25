@@ -1,12 +1,12 @@
 package com.example.lorenai.mycamapp;
 
-import java.io.IOException;
-import java.io.ByteArrayOutputStream;
-
 import android.net.Uri;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.provider.MediaStore;
+
+import java.io.IOException;
+import java.io.ByteArrayOutputStream;
 
 /**
  * Created by jhansi on 05/04/15.

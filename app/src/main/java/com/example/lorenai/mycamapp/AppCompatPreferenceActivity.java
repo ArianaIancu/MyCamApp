@@ -1,11 +1,13 @@
 package com.example.lorenai.mycamapp;
 
-import android.os.Bundle;
-import android.content.res.Configuration;
-import android.preference.PreferenceActivity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.MenuInflater;
+
+import android.os.Bundle;
+import android.content.res.Configuration;
+import android.preference.PreferenceActivity;
+
 import android.support.annotation.Nullable;
 import android.support.annotation.LayoutRes;
 import android.support.v7.app.ActionBar;

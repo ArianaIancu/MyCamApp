@@ -1,26 +1,31 @@
 package com.example.lorenai.mycamapp;
 
-import java.io.File;
-import java.io.IOException;
-
 import android.net.Uri;
-import android.support.annotation.NonNull;
-import android.support.design.widget.BottomNavigationView;
 import android.util.Log;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.provider.MediaStore;
-import android.support.v4.content.FileProvider;
+
+import java.io.File;
+import java.io.IOException;
+
 import android.app.Activity;
 import android.app.Fragment;
+
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.LayoutInflater;
+
 import android.content.Intent;
 import android.content.Context;
 import android.content.res.AssetFileDescriptor;
+
+import android.support.annotation.NonNull;
+import android.support.v4.content.FileProvider;
+import android.support.design.widget.BottomNavigationView;
 
 /**
  * Created by jhansi on 04/04/15.

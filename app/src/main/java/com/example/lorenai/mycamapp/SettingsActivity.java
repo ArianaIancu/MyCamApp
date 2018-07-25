@@ -1,25 +1,25 @@
 package com.example.lorenai.mycamapp;
 
 import java.util.List;
-import android.net.Uri;
 import android.view.MenuItem;
-import android.text.TextUtils;
 import android.annotation.TargetApi;
-import android.support.v4.app.NavUtils;
-import android.support.v7.app.ActionBar;
+
 import android.os.Build;
 import android.os.Bundle;
-import android.media.Ringtone;
-import android.media.RingtoneManager;
+
+import android.support.v4.app.NavUtils;
+import android.support.v7.app.ActionBar;
+
 import android.content.Intent;
 import android.content.Context;
 import android.content.res.Configuration;
+
 import android.preference.Preference;
 import android.preference.ListPreference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceFragment;
-import android.preference.RingtonePreference;
+
 
 /**
  * A {@link PreferenceActivity} that presents a set of application settings. On

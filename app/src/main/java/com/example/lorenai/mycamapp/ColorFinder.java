@@ -1,26 +1,37 @@
 package com.example.lorenai.mycamapp;
 
-import java.io.ByteArrayOutputStream;
-import java.io.OutputStream;
-import java.util.Date;
-import java.text.SimpleDateFormat;
-import java.io.File;
-import java.io.IOException;
-import java.io.FileOutputStream;
-
-import android.content.IntentSender;
-import android.content.SharedPreferences;
-import android.content.pm.ActivityInfo;
-import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
-import android.preference.PreferenceManager;
-import android.util.Log;
+import android.nfc.Tag;
 import android.view.View;
-import android.graphics.Bitmap;
+
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.text.SimpleDateFormat;
+
+import android.preference.PreferenceManager;
 import android.media.MediaScannerConnection;
+
+import java.util.Date;
+
+import android.util.Log;
+
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+
 import android.os.Bundle;
 import android.os.AsyncTask;
 import android.os.Environment;
+
+import android.content.IntentSender;
+import android.content.pm.ActivityInfo;
+import android.content.SharedPreferences;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.FileOutputStream;
+import java.io.ByteArrayOutputStream;
+
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.ImageView;
@@ -28,16 +39,21 @@ import android.widget.RelativeLayout;
 import android.support.v7.graphics.Palette;
 import android.support.v7.app.AppCompatActivity;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GoogleApiAvailability;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.drive.Drive;
 import com.google.android.gms.drive.DriveApi;
+import com.google.android.gms.drive.DriveContents;
 import com.google.android.gms.drive.DriveFile;
+import com.google.android.gms.drive.DriveFolder;
+import com.google.android.gms.drive.DriveId;
 import com.google.android.gms.drive.MetadataChangeSet;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 
-public class ColorFinder extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener  {
+public class ColorFinder extends ConnectDriveService implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     private Bitmap original;
     public RelativeLayout outerLayout;
@@ -55,7 +71,7 @@ public class ColorFinder extends AppCompatActivity implements GoogleApiClient.Co
     private File mImageFolderPP; //purple pink
     private File mImageFolder; // everything else
 
-    static public float[] color ;
+    static public float[] color;
     static public String colorName;
 
     @Override
@@ -82,7 +98,7 @@ public class ColorFinder extends AppCompatActivity implements GoogleApiClient.Co
 
         PreferenceManager.setDefaultValues(this, R.xml.pref_general, false);
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        ScanConstants.FOLDER_NAME = preferences.getString("folder_name"," ");
+        ScanConstants.FOLDER_NAME = preferences.getString("folder_name", " ");
         drive_email = preferences.getString("drive_email", " ");
 
         createImageFolder();
@@ -102,20 +118,20 @@ public class ColorFinder extends AppCompatActivity implements GoogleApiClient.Co
                     } else if (color[0] >= 180 && color[0] <= 252) { // Blue
                         bodyText.setText("Blue");
                         colorName = "Blue";
-                    } else if (color[0] >= 0  && color[0] <= 11) { // Red Ver. 1
+                    } else if (color[0] >= 0 && color[0] <= 11) { // Red Ver. 1
                         bodyText.setText("Red");
                         colorName = "Red";
                     } else if (color[0] >= 353 && color[0] <= 360) {  // Red Ver. 2
                         bodyText.setText("Red");
                         colorName = "Red";
-                    } else if (color[0] >= 12 && color[0] <= 62 ) { // Yellow&Orange
+                    } else if (color[0] >= 12 && color[0] <= 62) { // Yellow&Orange
                         bodyText.setText("Yellow/Orange");
                         colorName = "Yellow/Orange";
                     } else if (color[0] > 252 && color[0] <= 352) { // Purple&Pink
                         bodyText.setText("Purple/Pink");
                         colorName = "Purple/Pink";
                     } else {
-                        colorName= "NoColorFound";
+                        colorName = "NoColorFound";
                     }
                 }
             }
@@ -178,12 +194,12 @@ public class ColorFinder extends AppCompatActivity implements GoogleApiClient.Co
     }
 
     private void createImageFolder() {
-        mImageFolderR = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),"MyCamAppRed");
-        mImageFolderB = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),"MyCamAppBlue");
-        mImageFolderG = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),"MyCamAppGreen");
-        mImageFolderYO = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),"MyCamAppYellow&Orange");
-        mImageFolderPP = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),"MyCamAppPurple&Pink");
-        mImageFolder = new java.io.File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),ScanConstants.FOLDER_NAME);
+        mImageFolderR = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "MyCamAppRed");
+        mImageFolderB = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "MyCamAppBlue");
+        mImageFolderG = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "MyCamAppGreen");
+        mImageFolderYO = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "MyCamAppYellow&Orange");
+        mImageFolderPP = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "MyCamAppPurple&Pink");
+        mImageFolder = new java.io.File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), ScanConstants.FOLDER_NAME);
 
         if (!mImageFolder.exists()) {
             mImageFolder.mkdir();
@@ -211,7 +227,7 @@ public class ColorFinder extends AppCompatActivity implements GoogleApiClient.Co
         File file = File.createTempFile(prepend, ".jpg", folder);
         try {
             FileOutputStream out = new FileOutputStream(file);
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 90 , out);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 90, out);
             out.flush();
             out.close();
         } catch (Exception e) {
@@ -238,7 +254,7 @@ public class ColorFinder extends AppCompatActivity implements GoogleApiClient.Co
     private GoogleApiClient mGoogleApiClient;
     private static final String TAG = "Google Drive Activity";
 
-    private static final  int REQUEST_CODE_CREATOR = 2;
+    private static final int REQUEST_CODE_CREATOR = 2;
     private static final int REQUEST_CODE_RESOLUTION = 3;
 
 
@@ -282,15 +298,69 @@ public class ColorFinder extends AppCompatActivity implements GoogleApiClient.Co
     }
 
     @Override
-    public void onConnected(Bundle connectionHint) { }
+    public void onConnected(Bundle connectionHint) {
+    }
 
     @Override
     public void onConnectionSuspended(int cause) {
         Log.i(TAG, "GoogleApiClient connection suspended");
     }
 
+    public void dealWithDriveFolder(){
+        String folderRed = "MyCamAppRed";
+        String folderBlue = "MyCamAppBlue";
+        String folderGreen = "MyCamAppGreen";
+        String folderPP = "MyCamAppPurple&Pink";
+        String folderYO = "MyCamAppYellow&Orange";
+        String folderDefault = "MyCamApp";
+
+        //createFolder(folderRed);
+        //createFolder(folderGreen);
+        //createFolder(folderBlue);
+        //createFolder(folderPP);
+        //createFolder(folderYO);
+        createFolder(folderRed);
+
+        /*
+        pickFolder(folderRed)
+                .addOnSuccessListener(this,
+                        driveId -> createFileInFolder(driveId.asDriveFolder()))
+                .addOnFailureListener(this, e -> {
+                    Log.e(TAG, "No folder selected", e);
+                    finish();
+                });
+      */
+    }
+
     public void createFile() {
         connectDude();
+        dealWithDriveFolder();
+
+
+        /*
+        pickFolder(String.valueOf(folderRed))
+                .addOnSuccessListener(this,
+                        driveId -> createFileInFolder(driveId.asDriveFolder()))
+                .addOnFailureListener(this, e -> {
+                    Log.e(TAG, "No folder selected", e);
+                    finish();
+                });
+
+        pickFolder(String.valueOf(folderBlue))
+                .addOnSuccessListener(this,
+                        driveId -> createFileInFolder(driveId.asDriveFolder()))
+                .addOnFailureListener(this, e -> {
+                    Log.e(TAG, "No folder selected", e);
+                    finish();
+                });
+*/
+
+        //       .addOnSuccessListener(this,
+        //              driveId -> createFileInFolder(driveId.asDriveFolder()))
+        //      .addOnFailureListener(this, e -> {
+        //         Log.e(TAG, "No folder selected", e);
+        //        finish();
+        //   });
         saveFileToDrive();
        /*
             AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
@@ -309,7 +379,7 @@ public class ColorFinder extends AppCompatActivity implements GoogleApiClient.Co
     private void saveFileToDrive() {
         // Start by creating a new contents, and setting a callback.
         Log.i(TAG, "Creating new contents.");
-        final Bitmap image = ((BitmapDrawable)scannedImageView.getDrawable()).getBitmap();
+        final Bitmap image = ((BitmapDrawable) scannedImageView.getDrawable()).getBitmap();
         Drive.DriveApi.newDriveContents(mGoogleApiClient)
                 .setResultCallback(new ResultCallback<DriveApi.DriveContentsResult>() {
                     @Override
@@ -335,13 +405,13 @@ public class ColorFinder extends AppCompatActivity implements GoogleApiClient.Co
                         }
                         // Create the initial metadata - MIME type and title.
                         // Note that the user will be able to change the title later.
-                        MetadataChangeSet metaData = new MetadataChangeSet.Builder().setMimeType("application/vnd.google-apps.folder").setTitle("MyCamApp").build();
                         MetadataChangeSet metadataChangeSet = new MetadataChangeSet.Builder().setMimeType("image/jpeg").setTitle("Android Photo.png").build();
                         // Create an intent for the file chooser, and start it.
                         IntentSender intentSender = Drive.DriveApi
                                 .newCreateFileActivityBuilder()
                                 .setInitialMetadata(metadataChangeSet)
                                 .setInitialDriveContents(result.getDriveContents())
+                                .setActivityStartFolder(fId)
                                 .build(mGoogleApiClient);
                         try {
                             startIntentSenderForResult(intentSender, REQUEST_CODE_CREATOR, null, 0, 0, 0);
@@ -351,5 +421,58 @@ public class ColorFinder extends AppCompatActivity implements GoogleApiClient.Co
                     }
                 });
     }
+
+    @Override
+    protected void onDriveClientReady() {
+    }
+
+    public static String nameTest;
+    public DriveId fId;
+
+    // Create_folder
+    public void createFolder(String name) {
+        nameTest = name;
+        getDriveResourceClient().getRootFolder().continueWithTask(task -> {
+            DriveFolder parentFolder = task.getResult();
+            MetadataChangeSet changeSet = new MetadataChangeSet.Builder()
+                    .setTitle(name)
+                    .setMimeType(DriveFolder.MIME_TYPE)
+                    .setStarred(true)
+                    .build();
+            return getDriveResourceClient().createFolder(parentFolder, changeSet);
+        }).addOnSuccessListener(this,
+                driveFolder -> { fId = driveFolder.getDriveId();
+                    Log.i(TAG, "Created folder");
+                    finish();
+                })
+                .addOnFailureListener(this, e -> {
+                    Log.e(TAG, "Unable to create folder", e);
+                    finish();
+                });
+    }
+
+    private void createFileInFolder(final DriveFolder parent) {
+        getDriveResourceClient()
+                .createContents()
+                .continueWithTask(task -> {
+                    DriveContents contents = task.getResult();
+                    OutputStream outputStream = contents.getOutputStream();
+                    try (Writer writer = new OutputStreamWriter(outputStream)) {
+                        writer.write("Hello World!");
+                    }
+
+                    MetadataChangeSet changeSet = new MetadataChangeSet.Builder()
+                            .setTitle("New file")
+                            .setMimeType("text/plain")
+                            .setStarred(true)
+                            .build();
+
+                    return getDriveResourceClient().createFile(parent, changeSet, contents);
+                })
+                .addOnFailureListener(this, e -> {
+                    Log.e(TAG, "Unable to create file", e);
+                });
+    }
+
 
 }

@@ -1,32 +1,37 @@
 package com.example.lorenai.mycamapp;
 
+import android.net.Uri;
+import java.text.SimpleDateFormat;
 import static android.app.Activity.RESULT_OK;
+
+import java.util.Date;
+import android.util.Log;
+
+import android.app.Activity;
+import android.app.Fragment;
+
+import android.os.Bundle;
+import android.os.Environment;
 
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
-import java.util.Date;
-import java.text.SimpleDateFormat;
 import java.io.File;
 import java.io.IOException;
 import java.io.FileOutputStream;
 
-import android.net.Uri;
-import android.util.Log;
+import android.widget.Toast;
+import android.widget.Button;
+import android.widget.ImageView;
+
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.LayoutInflater;
+
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.provider.MediaStore;
 import android.media.MediaScannerConnection;
-import android.app.Activity;
-import android.app.Fragment;
-import android.os.Bundle;
-import android.os.Environment;
-import android.widget.Toast;
-import android.widget.Button;
-import android.widget.ImageView;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.LayoutInflater;
 
 /**
  * Created by jhansi on 29/03/15.

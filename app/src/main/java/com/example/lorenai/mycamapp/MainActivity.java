@@ -1,47 +1,58 @@
 package com.example.lorenai.mycamapp;
 
-import java.io.ByteArrayOutputStream;
-import java.io.OutputStream;
 import java.util.Date;
+import android.net.Uri;
+import android.Manifest;
+import android.util.Log;
+import android.widget.ImageView;
 import java.text.SimpleDateFormat;
-import java.io.IOException;
+import android.provider.MediaStore;
+import android.preference.PreferenceManager;
 
+import android.os.Bundle;
+import android.os.Environment;
+
+import android.view.View;
+import android.view.MenuItem;
+
+import android.app.AlertDialog;
+import android.app.FragmentTransaction;
+
+import android.content.IntentSender;
+import android.content.pm.ActivityInfo;
+
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.ByteArrayOutputStream;
+
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.FileProvider;
+import android.support.v7.app.AppCompatActivity;
+import android.support.design.widget.BottomNavigationView;
+
+import android.content.Intent;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.content.ComponentCallbacks2;
+
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.drive.Drive;
 import com.google.android.gms.drive.DriveApi;
+import com.google.android.gms.drive.DriveClient;
 import com.google.android.gms.drive.DriveFile;
+import com.google.android.gms.drive.DriveFolder;
+import com.google.android.gms.drive.DriveResourceClient;
 import com.google.android.gms.drive.MetadataChangeSet;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.GoogleApiAvailability;
-
-import android.content.IntentSender;
-import android.content.pm.ActivityInfo;
-import android.graphics.drawable.BitmapDrawable;
-import android.net.Uri;
-import android.util.Log;
-import android.Manifest;
-import android.provider.MediaStore;
-import android.preference.PreferenceManager;
-import android.os.Bundle;
-import android.os.Environment;
-import android.view.MenuItem;
-import android.view.View;
-import android.widget.ImageView;
-import android.app.AlertDialog;
-import android.app.FragmentTransaction;
-import android.graphics.Bitmap;
-import android.support.annotation.NonNull;
-import android.support.design.widget.BottomNavigationView;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.FileProvider;
-import android.support.v7.app.AppCompatActivity;
-import android.content.Context;
-import android.content.Intent;
-import android.content.DialogInterface;
-import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
-import android.content.ComponentCallbacks2;
 
 public class MainActivity extends AppCompatActivity implements IScanner, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
@@ -415,7 +426,6 @@ public class MainActivity extends AppCompatActivity implements IScanner, GoogleA
                         }
                         // Create the initial metadata - MIME type and title.
                         // Note that the user will be able to change the title later.
-                        MetadataChangeSet metaData = new MetadataChangeSet.Builder().setMimeType("application/vnd.google-apps.folder").setTitle("MyCamApp").build();
                         MetadataChangeSet metadataChangeSet = new MetadataChangeSet.Builder().setMimeType("image/jpeg").setTitle("Android Photo.png").build();
                         // Create an intent for the file chooser, and start it.
                         IntentSender intentSender = Drive.DriveApi
@@ -431,4 +441,5 @@ public class MainActivity extends AppCompatActivity implements IScanner, GoogleA
                     }
                 });
     }
+
 }
