@@ -3,6 +3,7 @@ package com.example.lorenai.mycamapp;
 import java.util.Date;
 import android.net.Uri;
 import android.Manifest;
+
 import android.util.Log;
 import android.widget.ImageView;
 import java.text.SimpleDateFormat;
@@ -40,14 +41,11 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.ComponentCallbacks2;
+import android.widget.Toast;
 
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.drive.Drive;
 import com.google.android.gms.drive.DriveApi;
-import com.google.android.gms.drive.DriveClient;
 import com.google.android.gms.drive.DriveFile;
-import com.google.android.gms.drive.DriveFolder;
-import com.google.android.gms.drive.DriveResourceClient;
 import com.google.android.gms.drive.MetadataChangeSet;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.ResultCallback;
@@ -333,16 +331,20 @@ public class MainActivity extends AppCompatActivity implements IScanner, GoogleA
 
 
     public void connectDude() {
-        if (mGoogleApiClient == null) {
-            mGoogleApiClient = new GoogleApiClient.Builder(getApplicationContext())
-                    .addApi(Drive.API)
-                    .setAccountName(drive_email)
-                    .addConnectionCallbacks(this)
-                    .addScope(Drive.SCOPE_FILE)
-                    .addOnConnectionFailedListener(this)
-                    .build();
+        if (drive_email.isEmpty()) {
+            Log.i(TAG, "There is no email given");
+        } else {
+            if (mGoogleApiClient == null) {
+                mGoogleApiClient = new GoogleApiClient.Builder(getApplicationContext())
+                        .addApi(Drive.API)
+                        .setAccountName(drive_email)
+                        .addConnectionCallbacks(this)
+                        .addScope(Drive.SCOPE_FILE)
+                        .addOnConnectionFailedListener(this)
+                        .build();
+            }
+            mGoogleApiClient.connect();
         }
-        mGoogleApiClient.connect();
     }
 
     @Override
@@ -380,8 +382,23 @@ public class MainActivity extends AppCompatActivity implements IScanner, GoogleA
     }
 
     public void onClickCreateFile(View view) {
-       connectDude();
-       saveFileToDrive();
+        connectDude();
+        if (drive_email.isEmpty()) {
+            android.support.v7.app.AlertDialog alertDialog = new android.support.v7.app.AlertDialog.Builder(this).create();
+            alertDialog.setTitle("Invalid Account");
+            alertDialog.setMessage("The specified account does not exist on this device. Please choose a different account in the Settings Menu.");
+            alertDialog.setButton(android.support.v7.app.AlertDialog.BUTTON_NEUTRAL, "OK",
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+            alertDialog.show();
+        } else {
+            Toast.makeText(this, "Saving...", Toast.LENGTH_SHORT).show();
+            saveFileToDrive();
+        }
+    }
        /*
             AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
             alertDialog.setTitle("Can't connect");
@@ -394,7 +411,6 @@ public class MainActivity extends AppCompatActivity implements IScanner, GoogleA
                     });
             alertDialog.show();
      */
-    }
 
     private void saveFileToDrive() {
         // Start by creating a new contents, and setting a callback.

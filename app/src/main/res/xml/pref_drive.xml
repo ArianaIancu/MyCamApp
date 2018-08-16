@@ -1,16 +1,72 @@
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:key="drivePref">
 
     <Preference
         android:title="@string/drive_email_description" />
 
     <EditTextPreference
         android:capitalize="words"
+        android:defaultValue="MyDriveEmail@gmail.com"
         android:inputType="textCapWords"
         android:key="drive_email"
         android:maxLines="1"
         android:selectAllOnFocus="true"
         android:singleLine="true"
         android:title="@string/title_drive_email" />
-     <!--  android:defaultValue="@string/drive_default" -->
+
+    <PreferenceCategory
+        android:key="hiddenDriveOptions" >
+
+    <EditTextPreference
+        android:key="fIdRed"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:title=""
+        android:enabled="false"/>
+
+    <EditTextPreference
+        android:key="fIdBlue"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:title=""
+        android:enabled="false"/>
+
+    <EditTextPreference
+        android:key="fIdGreen"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:title=""
+        android:enabled="false"/>
+
+    <EditTextPreference
+        android:key="fIdPP"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:title=""
+        android:enabled="false"/>
+
+    <EditTextPreference
+        android:key="fIdYO"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:title=""
+        android:enabled="false"/>
+
+    <EditTextPreference
+        android:key="fIdDefault"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:title=""
+        android:enabled="false"/>
+
+    <EditTextPreference
+        android:defaultValue="false"
+        android:key="fIdCreated"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:title=""
+        android:enabled="false"/>
+
+    </PreferenceCategory>
 
 </PreferenceScreen>

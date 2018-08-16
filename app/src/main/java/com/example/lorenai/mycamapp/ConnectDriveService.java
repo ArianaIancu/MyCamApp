@@ -1,14 +1,12 @@
 package com.example.lorenai.mycamapp;
 
-import android.app.Activity;
-import android.content.Intent;
 
-import android.content.IntentSender;
+import android.content.Intent;
 import android.content.SharedPreferences;
+
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -18,13 +16,9 @@ import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.drive.Drive;
 import com.google.android.gms.drive.DriveClient;
 
-import com.google.android.gms.drive.DriveFolder;
 import com.google.android.gms.drive.DriveId;
 import com.google.android.gms.drive.DriveResourceClient;
 import com.google.android.gms.drive.OpenFileActivityOptions;
-import com.google.android.gms.drive.query.Filters;
-import com.google.android.gms.drive.query.SearchableField;
-import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.TaskCompletionSource;
 
@@ -88,7 +82,8 @@ public abstract class ConnectDriveService extends AppCompatActivity {
                     // required and is fatal. For apps where sign-in is optional, handle
                     // appropriately
                     Log.e(TAG, "Sign-in failed.");
-                    finish();
+                    //finish();
+                    ScanConstants.EMAIL_GOOD = "bad";
                     return;
                 }
 
@@ -98,7 +93,9 @@ public abstract class ConnectDriveService extends AppCompatActivity {
                     initializeDriveClient(getAccountTask.getResult());
                 } else {
                     Log.e(TAG, "Sign-in failed.");
-                    finish();
+                    ScanConstants.EMAIL_GOOD = "bad";
+                 //   finish();
+                    return;
                 }
                 break;
             case REQUEST_CODE_OPEN_ITEM:
@@ -115,39 +112,6 @@ public abstract class ConnectDriveService extends AppCompatActivity {
     }
 
     /**
-     * Prompts the user to select a folder using OpenFileActivity.
-     *
-     * @return Task that resolves with the selected item's ID.
-     */
-    protected Task<DriveId> pickFolder(String name) {
-        OpenFileActivityOptions openOptions =
-                new OpenFileActivityOptions.Builder()
-                        .setSelectionFilter(
-                                Filters.eq(SearchableField.MIME_TYPE, DriveFolder.MIME_TYPE))
-                        .setActivityTitle(name)
-                        .build();
-        return pickItem(openOptions);
-    }
-
-    /**
-     * Prompts the user to select a folder using OpenFileActivity.
-     *
-     * @param openOptions Filter that should be applied to the selection
-     * @return Task that resolves with the selected item's ID.
-     */
-    private Task<DriveId> pickItem(OpenFileActivityOptions openOptions) {
-        mOpenItemTaskSource = new TaskCompletionSource<>();
-        getDriveClient()
-                .newOpenFileActivityIntentSender(openOptions)
-                .continueWith((Continuation<IntentSender, Void>) task -> {
-                    startIntentSenderForResult(
-                            task.getResult(), REQUEST_CODE_OPEN_ITEM, null, 0, 0, 0);
-                    return null;
-                });
-        return mOpenItemTaskSource.getTask();
-    }
-
-    /**
      * Starts the sign-in process and initializes the Drive client.
      */
     protected void signIn() {
@@ -156,7 +120,16 @@ public abstract class ConnectDriveService extends AppCompatActivity {
         requiredScopes.add(Drive.SCOPE_APPFOLDER);
         GoogleSignInAccount signInAccount = GoogleSignIn.getLastSignedInAccount(this);
         if (signInAccount != null && signInAccount.getGrantedScopes().containsAll(requiredScopes)) {
-            initializeDriveClient(signInAccount);
+            ScanConstants.EMAIL_CHANGED = "yes";
+        }
+        else {
+            ScanConstants.EMAIL_CHANGED = "no";
+        }
+        if (drive_email.isEmpty()) {
+            Log.e(TAG, "Sign-in failed.");
+            //finish();
+            ScanConstants.EMAIL_GOOD = "bad";
+            return;
         } else {
             GoogleSignInOptions signInOptions =
                     new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
