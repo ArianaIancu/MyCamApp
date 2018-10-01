@@ -86,4 +86,13 @@
         android:layout_alignEnd="@+id/theImage"
         android:text="Save To Drive" />
 
+    <Button
+        android:id="@+id/changeRed"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/saveButton"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="11dp"
+        android:text="Red" />
+
 </RelativeLayout>

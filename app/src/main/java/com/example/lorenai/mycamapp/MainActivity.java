@@ -70,7 +70,6 @@ public class MainActivity extends AppCompatActivity implements IScanner, GoogleA
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
 
         final SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
@@ -110,6 +109,8 @@ public class MainActivity extends AppCompatActivity implements IScanner, GoogleA
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         ScanConstants.FOLDER_NAME = preferences.getString("folder_name"," ");
         drive_email = preferences.getString("drive_email", " ");
+
+        createImageFolder();
 
     }
 

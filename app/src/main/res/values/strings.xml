@@ -23,9 +23,12 @@
     <string name="pref_description_social_recommendations">After editing, detect the main color from your image</string>
 
     <!-- Drive Settings -->
-    <string name="pref_header_drive">Google Drive</string>
+    <string name="pref_header_drive">Emails</string>
     <string name="drive_default"> None </string>
     <string name="title_drive_email"> Google Drive Email </string>
+    <string name="title_email_email"> Your email </string>
     <string name="drive_email_description"> Restart app after changing the email </string>
+    <string name="pref_title_send_email">Enable sending email</string>
+    <string name="pref_description_send_email">After editing, send the picture as an email </string>
 
 </resources>

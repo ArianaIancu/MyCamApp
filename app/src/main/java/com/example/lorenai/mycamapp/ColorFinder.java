@@ -1,7 +1,9 @@
 package com.example.lorenai.mycamapp;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.net.Uri;
+import android.os.StrictMode;
 import android.view.View;
 
 import java.text.SimpleDateFormat;
@@ -58,15 +60,16 @@ public class ColorFinder extends ConnectDriveService implements GoogleApiClient.
     private Button doneButton;
     private Button saveColorDrive;
 
-    private File mImageFolderB; // albastru
-    private File mImageFolderG; // verde
-    private File mImageFolderR; // rosu
-    private File mImageFolderYO; // galben + portocaliu
-    private File mImageFolderPP; //purple pink
-    private File mImageFolder; // everything else
+    private File mImageFolderB; // Albastru
+    private File mImageFolderG; // Verde
+    private File mImageFolderR; // Rosu
+    private File mImageFolderYO; // Galben + Portocaliu
+    private File mImageFolderPP; // Purple + Pink
+    private File mImageFolder; // Everything else
 
     static public float[] color;
     static public String colorName;
+    public Uri savedUri;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,13 +89,12 @@ public class ColorFinder extends ConnectDriveService implements GoogleApiClient.
         doneButton.setOnClickListener(new ColorFinder.SaveButtonClickListener());
         saveColorDrive = (Button) findViewById(R.id.saveColorDrive);
         saveColorDrive.setOnClickListener(new ColorFinder.SaveDriveClickListener());
-        original = getBitmap();
 
+        original = getBitmap();
         scannedImageView.setImageBitmap(original);
 
         PreferenceManager.setDefaultValues(this, R.xml.pref_general, false);
         PreferenceManager.setDefaultValues(this, R.xml.pref_drive, false);
-      //  PreferenceManager.setDefaultValues(this, R.xml.pref_hidden, false);
 
         createImageFolder();
 
@@ -150,6 +152,9 @@ public class ColorFinder extends ConnectDriveService implements GoogleApiClient.
                 @Override
                 public void run() {
                     try {
+                        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                        Boolean sendEmail = preferences.getBoolean("send_email", false);
+
                         if (colorName == "Red") {
                             createImageFileName(original, mImageFolderR);
                         } else if (colorName == "Green") {
@@ -163,9 +168,22 @@ public class ColorFinder extends ConnectDriveService implements GoogleApiClient.
                         } else {
                             createImageFileName(original, mImageFolder);
                         }
-                        original.recycle();
-                        System.gc();
-                        finish();
+
+                        if (sendEmail == true) {
+                            Intent emailIntent = new Intent(android.content.Intent.ACTION_SEND);
+                            emailIntent.setType("plain/text");
+                            emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "MyCamApp Email");
+                            emailIntent.putExtra(Intent.EXTRA_TEXT, "Main Color: " + colorName);
+                            StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
+                            StrictMode.setVmPolicy(builder.build());
+                            if (savedUri != null) {
+                                emailIntent.putExtra(Intent.EXTRA_STREAM, savedUri);
+                            }
+                            startActivity(emailIntent);
+                        }
+                            original.recycle();
+                            System.gc();
+                            finish();
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -229,6 +247,9 @@ public class ColorFinder extends ConnectDriveService implements GoogleApiClient.
                         Log.i("ExternalStorage", "-> uri=" + uri);
                     }
                 });
+
+        savedUri = Uri.fromFile(file);
+
     }
 
     @Override
@@ -338,18 +359,6 @@ public class ColorFinder extends ConnectDriveService implements GoogleApiClient.
                 saveFileToDrive();
             } else if (ScanConstants.EMAIL_GOOD.equals("bad")) {
                 Log.i(TAG, "GoogleApiClient is not connected!");
-                /*
-                android.support.v7.app.AlertDialog alertDialog = new android.support.v7.app.AlertDialog.Builder(this).create();
-                alertDialog.setTitle("Invalid Account");
-                alertDialog.setMessage("The specified account does not exist on this device. Please choose a different account in the Settings Menu.");
-                alertDialog.setButton(android.support.v7.app.AlertDialog.BUTTON_NEUTRAL, "OK",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.dismiss();
-                            }
-                        });
-                alertDialog.show();
-                */
             } else if (!drive_email.equals(" ")) {
                 createFolderDefault();
                 createFolderRed();

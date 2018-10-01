@@ -41,4 +41,7 @@ dependencies {
     implementation 'com.theartofdev.edmodo:android-image-cropper:2.7.+'
     implementation 'com.google.android.gms:play-services:12.0.1'
     implementation project(':scanLibrary')
+    implementation files('libs/activation.jar')
+    implementation files('libs/additionnal.jar')
+    implementation files('libs/mail.jar')
 }

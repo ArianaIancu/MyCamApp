@@ -1,27 +1,32 @@
 package com.example.lorenai.mycamapp;
 
-import android.net.Uri;
-import java.io.IOException;
+import android.app.Fragment;
+import android.app.FragmentManager;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
-import com.scanlibrary.ScanActivity;
-import android.preference.PreferenceManager;
-import static android.app.Activity.RESULT_OK;
-
-import android.os.Bundle;
+import android.media.MediaScannerConnection;
+import android.net.Uri;
 import android.os.AsyncTask;
-
+import android.os.Bundle;
+import android.os.Environment;
+import android.preference.PreferenceManager;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 
-import android.app.Fragment;
-import android.app.FragmentManager;
+import com.scanlibrary.ScanActivity;
 
-import android.content.Intent;
-import android.content.SharedPreferences;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.LayoutInflater;
+import static android.app.Activity.RESULT_OK;
 
 /**
  * Created by jhansi on 29/03/15.
@@ -32,6 +37,7 @@ public class ResultFragment extends Fragment {
     private View view;
     private ImageView scannedImageView;
     private static ProgressDialogFragment progressDialogFragment;
+    public Uri savedUri;
 
     private Bitmap original;
     private Bitmap transformed;
@@ -91,6 +97,30 @@ public class ResultFragment extends Fragment {
         scannedImageView.setImageBitmap(scannedImage);
     }
 
+    private void createImageFileName(Bitmap bitmap, File folder) throws IOException {
+        String timestamp = new SimpleDateFormat("yyyyMMdd HHmmss").format(new Date());
+        String prepend = "IMAGE" + timestamp + "_";
+        File file = File.createTempFile(prepend, ".jpg", folder);
+        try {
+            FileOutputStream out = new FileOutputStream(file);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 90, out);
+            out.flush();
+            out.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        MediaScannerConnection.scanFile(getContext(), new String[]{file.toString()}, null,
+                new MediaScannerConnection.OnScanCompletedListener() {
+                    public void onScanCompleted(String path, Uri uri) {
+                        Log.i("ExternalStorage", "Scanned " + path + ":");
+                        Log.i("ExternalStorage", "-> uri=" + uri);
+                    }
+                });
+
+        savedUri = Uri.fromFile(file);
+    }
+
     private class DoneButtonClickListener implements View.OnClickListener {
         @Override
         public void onClick(View v) {
@@ -105,22 +135,25 @@ public class ResultFragment extends Fragment {
                             bitmap = original;
                         }
                         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
-                        if (preferences.getBoolean("example_switch", true) == true){
+                        Boolean sendColor = preferences.getBoolean("example_switch", true);
+                        File mImageFolder = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), ScanConstants.FOLDER_NAME);
+                        createImageFileName(bitmap, mImageFolder);
+                        if (sendColor == true) {
                             final Uri uri = Util.getUri(getActivity(), bitmap);
                             data.putExtra(ScanConstants.SCANNED_RESULT, uri);
                             getActivity().setResult(RESULT_OK, data);
                             System.gc();
                             getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                dismissDialog();
-                                Intent intent = new Intent(getActivity(), ColorFinder.class);
-                                Bundle bundle = new Bundle();
-                                bundle.putParcelable("bitmap", uri);
-                                intent.putExtras(bundle);
-                                startActivity(intent);
+                                @Override
+                                public void run() {
+                                    dismissDialog();
+                                    Intent intent = new Intent(getActivity(), ColorFinder.class);
+                                    Bundle bundle = new Bundle();
+                                    bundle.putParcelable("bitmap", uri);
+                                    intent.putExtras(bundle);
+                                    startActivity(intent);
                                 }
-                        });
+                            });
                         } else {
                             getActivity().finish();
                         }

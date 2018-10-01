@@ -65,16 +65,16 @@ public class ScanFragment extends Fragment implements CropImageView.OnSetImageUr
 
     public ScanFragment() { }
 
-    private void createImageFileName(Bitmap bitmap) throws IOException {
-        File mImageFolder = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),ScanConstants.FOLDER_NAME);
+    private void createImageFileName(Bitmap bitmap) throws  IOException {
+        File mImageFolder = new File (Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), ScanConstants.FOLDER_NAME);
         String timestamp = new SimpleDateFormat("yyyyMMdd HHmmss").format(new Date());
         String prepend = "IMAGE" + timestamp + "_";
-        File file = File.createTempFile(prepend, ".jpg", mImageFolder);
+        File file = File.createTempFile(prepend,".jpg", mImageFolder);
         savedUri = Uri.fromFile(file);
-
+      //  getActivity().finish();
         try {
             FileOutputStream out = new FileOutputStream(file);
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 90 , out);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 90, out);
             out.flush();
             out.close();
         } catch (Exception e) {
@@ -88,6 +88,8 @@ public class ScanFragment extends Fragment implements CropImageView.OnSetImageUr
                         Log.i("ExternalStorage", "-> uri=" + uri);
                     }
                 });
+
+
     }
 
     private void init() {
@@ -110,8 +112,7 @@ public class ScanFragment extends Fragment implements CropImageView.OnSetImageUr
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-            } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
-            }
+            } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) { }
         }
     }
 
