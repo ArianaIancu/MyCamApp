@@ -27,12 +27,14 @@
 
     <ImageView
         android:id="@+id/theImage"
-        android:layout_width="343dp"
-        android:layout_height="325dp"
+        android:layout_width="363dp"
+        android:layout_height="281dp"
         android:layout_alignParentTop="true"
+        android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_gravity="center"
-        android:layout_marginTop="76dp"
+        android:layout_marginTop="89dp"
+        android:layout_marginBottom="141dp"
         android:adjustViewBounds="false"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -54,27 +56,45 @@
         app:layout_constraintVertical_bias="0.018">
         <!-- android:background="@android:color/white" -->
 
+        <Button
+            android:id="@+id/changeResetColor"
+            android:layout_width="43dp"
+            android:layout_height="33dp"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginStart="283dp"
+            android:layout_marginTop="6dp"
+            android:layout_marginEnd="11dp"
+            android:layout_marginBottom="397dp"
+            android:background="@drawable/round_button"
+            android:backgroundTint="@color/bottom_background_color"
+            android:text="Reset color"
+            android:textSize="9dp" />
+
         <TextView
             android:id="@+id/title"
-            android:layout_width="168dp"
+            android:layout_width="132dp"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
+            android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
-            android:layout_marginStart="12dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="201dp"
             android:text="Main Color:"
             android:textColor="@color/black"
-            android:textSize="24dp" />
+            android:textSize="19dp" />
 
         <TextView
             android:id="@+id/body"
-            android:layout_width="165dp"
+            android:layout_width="142dp"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
-            android:layout_marginEnd="13dp"
-            android:textColor="@color/black"
+            android:layout_marginEnd="62dp"
             android:text="No color found"
-            android:textSize="24dp" />
+            android:textColor="@color/black"
+            android:textSize="19dp" />
 
     </RelativeLayout>
 
@@ -84,15 +104,84 @@
         android:layout_height="wrap_content"
         android:layout_above="@+id/saveButton"
         android:layout_alignEnd="@+id/theImage"
-        android:text="Save To Drive" />
+        android:layout_marginEnd="0dp"
+        android:layout_marginBottom="9dp"
+        android:text="Save To Drive"
+        android:textSize="12dp" />
 
     <Button
         android:id="@+id/changeRed"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="43dp"
+        android:layout_height="32dp"
         android:layout_above="@+id/saveButton"
         android:layout_alignParentStart="true"
         android:layout_marginStart="11dp"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/round_button"
+        android:backgroundTint="@color/light_red"
+        android:textSize="10dp"
         android:text="Red" />
+
+    <Button
+        android:id="@+id/changeGreen"
+        android:layout_width="43dp"
+        android:layout_height="32dp"
+        android:layout_above="@+id/saveButton"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="56dp"
+        android:layout_marginBottom="15dp"
+        android:background="@drawable/round_button"
+        android:backgroundTint="@color/light_green"
+        android:text="Green"
+        android:textSize="10dp" />
+
+    <Button
+        android:id="@+id/changeBlue"
+        android:layout_width="43dp"
+        android:layout_height="32dp"
+        android:layout_above="@+id/saveButton"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="101dp"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/round_button"
+        android:backgroundTint="@color/blue"
+        android:text="Blue"
+        android:textSize="10dp" />
+
+    <Button
+        android:id="@+id/changeYellowOrange"
+        android:layout_width="39dp"
+        android:layout_height="32dp"
+        android:layout_above="@+id/saveButton"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="146dp"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/round_button"
+        android:backgroundTint="@color/yellow_orange"
+        android:text="Yellow/Orange"
+        android:textSize="8dp" />
+
+    <Button
+        android:id="@+id/changePurplePink"
+        android:layout_width="43dp"
+        android:layout_height="33dp"
+        android:layout_above="@+id/saveButton"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="189dp"
+        android:layout_marginBottom="15dp"
+        android:background="@drawable/round_button"
+        android:backgroundTint="@color/pink_purple"
+        android:text="Purple/Pink"
+        android:textSize="9dp" />
+
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/changeRed"
+        android:layout_alignStart="@+id/changeRed"
+        android:text="Manually change color:" />
+
 
 </RelativeLayout>

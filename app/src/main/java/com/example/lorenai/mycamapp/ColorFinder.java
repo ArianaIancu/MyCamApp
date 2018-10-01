@@ -52,13 +52,28 @@ import com.google.android.gms.common.GoogleApiAvailability;
 
 public class ColorFinder extends ConnectDriveService implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
+    public Uri savedUri;
+
     private Bitmap original;
+
     public RelativeLayout outerLayout;
+    private int outerLayoutOriginal;
+
     public TextView titleText;
     public TextView bodyText;
     private ImageView scannedImageView;
+
+    private int titleTextOriginal;
+    private int bodyTextOriginal;
+
     private Button doneButton;
     private Button saveColorDrive;
+    private Button changeRed;
+    private Button changeGreen;
+    private Button changeBlue;
+    private Button changeYO;
+    private Button changePP;
+    private Button changeReset;
 
     private File mImageFolderB; // Albastru
     private File mImageFolderG; // Verde
@@ -69,7 +84,7 @@ public class ColorFinder extends ConnectDriveService implements GoogleApiClient.
 
     static public float[] color;
     static public String colorName;
-    public Uri savedUri;
+    static public String colorNameOriginal;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,6 +104,18 @@ public class ColorFinder extends ConnectDriveService implements GoogleApiClient.
         doneButton.setOnClickListener(new ColorFinder.SaveButtonClickListener());
         saveColorDrive = (Button) findViewById(R.id.saveColorDrive);
         saveColorDrive.setOnClickListener(new ColorFinder.SaveDriveClickListener());
+        changeRed = (Button) findViewById(R.id.changeRed);
+        changeRed.setOnClickListener(new ColorFinder.ChangeRedColorListener());
+        changeGreen = (Button) findViewById(R.id.changeGreen);
+        changeGreen.setOnClickListener(new ColorFinder.ChangeGreenColorListener());
+        changeBlue = (Button) findViewById(R.id.changeBlue);
+        changeBlue.setOnClickListener(new ColorFinder.ChangeBlueColorListener());
+        changeYO = (Button) findViewById(R.id.changeYellowOrange);
+        changeYO.setOnClickListener(new ColorFinder.ChangeYOColorListener());
+        changePP = (Button) findViewById(R.id.changePurplePink);
+        changePP.setOnClickListener(new ColorFinder.ChangePPColorListener());
+        changeReset = (Button) findViewById(R.id.changeResetColor);
+        changeReset.setOnClickListener(new ColorFinder.ChangeResetColorListener());
 
         original = getBitmap();
         scannedImageView.setImageBitmap(original);
@@ -102,35 +129,113 @@ public class ColorFinder extends ConnectDriveService implements GoogleApiClient.
             public void onGenerated(Palette palette) {
                 Palette.Swatch vibrantSwatch = palette.getVibrantSwatch();
                 if (vibrantSwatch != null) {
-                    outerLayout.setBackgroundColor(vibrantSwatch.getRgb());
+                    titleTextOriginal = vibrantSwatch.getTitleTextColor();
+                    bodyTextOriginal = vibrantSwatch.getBodyTextColor();
+                    outerLayoutOriginal = vibrantSwatch.getRgb();
+
+                    outerLayout.setBackgroundColor(outerLayoutOriginal);
                     color = vibrantSwatch.getHsl();
-                    titleText.setTextColor(vibrantSwatch.getTitleTextColor());
-                    bodyText.setTextColor(vibrantSwatch.getBodyTextColor());
+                    titleText.setTextColor(titleTextOriginal);
+                    bodyText.setTextColor(bodyTextOriginal);
 
                     if (color[0] >= 63 && color[0] <= 179) { // Green
                         bodyText.setText("Green");
                         colorName = "Green";
+                        colorNameOriginal = colorName;
                     } else if (color[0] >= 180 && color[0] <= 252) { // Blue
                         bodyText.setText("Blue");
                         colorName = "Blue";
+                        colorNameOriginal = colorName;
                     } else if (color[0] >= 0 && color[0] <= 11) { // Red Ver. 1
                         bodyText.setText("Red");
                         colorName = "Red";
+                        colorNameOriginal = colorName;
                     } else if (color[0] >= 353 && color[0] <= 360) {  // Red Ver. 2
                         bodyText.setText("Red");
                         colorName = "Red";
+                        colorNameOriginal = colorName;
                     } else if (color[0] >= 12 && color[0] <= 62) { // Yellow&Orange
                         bodyText.setText("Yellow/Orange");
                         colorName = "Yellow/Orange";
+                        colorNameOriginal = colorName;
                     } else if (color[0] > 252 && color[0] <= 352) { // Purple&Pink
                         bodyText.setText("Purple/Pink");
                         colorName = "Purple/Pink";
+                        colorNameOriginal = colorName;
                     } else {
                         colorName = "NoColorFound";
+                        colorNameOriginal = colorName;
                     }
                 }
             }
         });
+    }
+
+    private class ChangeResetColorListener implements View.OnClickListener {
+        @Override
+        public void onClick(View v) {
+            bodyText.setText(colorNameOriginal);
+            colorName = colorNameOriginal;
+            outerLayout.setBackgroundColor(outerLayoutOriginal);
+            titleText.setTextColor(titleTextOriginal);
+            bodyText.setTextColor(bodyTextOriginal);
+        }
+    }
+
+    private class ChangeRedColorListener implements View.OnClickListener {
+        @Override
+        public void onClick(View v) {
+            bodyText.setText("Red");
+            colorName = "Red";
+            outerLayout.setBackgroundColor(getResources().getColor(R.color.light_red));
+            titleText.setTextColor(getResources().getColor(R.color.black));
+            bodyText.setTextColor(getResources().getColor(R.color.red));
+        }
+    }
+
+    private class ChangeGreenColorListener implements View.OnClickListener {
+        @Override
+        public void onClick(View v) {
+            bodyText.setText("Green");
+            colorName = "Green";
+            outerLayout.setBackgroundColor(getResources().getColor(R.color.light_green));
+            titleText.setTextColor(getResources().getColor(R.color.black));
+            bodyText.setTextColor(getResources().getColor(R.color.green));
+
+        }
+    }
+
+    private class ChangeBlueColorListener implements View.OnClickListener {
+        @Override
+        public void onClick(View v) {
+            bodyText.setText("Blue");
+            colorName = "Blue";
+            outerLayout.setBackgroundColor(getResources().getColor(R.color.blue));
+            titleText.setTextColor(getResources().getColor(R.color.black));
+            bodyText.setTextColor(getResources().getColor(R.color.colorPrimaryDark));
+        }
+    }
+
+    private class ChangeYOColorListener implements View.OnClickListener {
+        @Override
+        public void onClick(View v) {
+            bodyText.setText("Yellow/Orange");
+            colorName = "Yellow/Orange";
+            outerLayout.setBackgroundColor(getResources().getColor(R.color.yellow_orange));
+            titleText.setTextColor(getResources().getColor(R.color.black));
+            bodyText.setTextColor(getResources().getColor(R.color.just_orange));
+        }
+    }
+
+    private class ChangePPColorListener implements View.OnClickListener {
+        @Override
+        public void onClick(View v) {
+            bodyText.setText("Purple/Pink");
+            colorName = "Purple/Pink";
+            outerLayout.setBackgroundColor(getResources().getColor(R.color.pink_purple));
+            titleText.setTextColor(getResources().getColor(R.color.black));
+            bodyText.setTextColor(getResources().getColor(R.color.just_purple));
+        }
     }
 
     private Bitmap getBitmap() {

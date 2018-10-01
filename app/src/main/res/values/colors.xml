@@ -8,4 +8,14 @@
     <color name="bottom_background_color">#ffc4c2bc</color>
     <color name="fragment_background">#f2f2f2</color>
 
+    <color name="red">#660000</color>
+    <color name="light_red">#ff4c4c</color>
+    <color name="blue">#599af4</color>
+    <color name="green">#008000</color>
+    <color name="light_green">#7fbf7f</color>
+    <color name="yellow_orange">#ffff4c</color>
+    <color name="pink_purple">#ffc0cb</color>
+    <color name="just_purple">#800080</color>
+    <color name="just_orange">#e69500</color>
+
 </resources>
