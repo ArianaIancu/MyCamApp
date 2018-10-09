@@ -1,10 +1,13 @@
 package com.example.lorenai.mycamapp;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.util.Date;
 import android.net.Uri;
 import android.Manifest;
 
 import android.util.Log;
+import android.widget.Button;
 import android.widget.ImageView;
 import java.text.SimpleDateFormat;
 import android.provider.MediaStore;
@@ -51,6 +54,12 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.GoogleApiAvailability;
+import com.itextpdf.text.BadElementException;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Image;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.pdf.PdfWriter;
 
 public class MainActivity extends AppCompatActivity implements IScanner, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 

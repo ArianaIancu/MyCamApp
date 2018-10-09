@@ -2,6 +2,7 @@ package com.example.lorenai.mycamapp;
 
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -17,12 +18,21 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.Toast;
 
+import com.itextpdf.text.BadElementException;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Image;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.pdf.PdfWriter;
 import com.scanlibrary.ScanActivity;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -48,6 +58,7 @@ public class ResultFragment extends Fragment {
     private Button originalButton;
     private Button grayModeButton;
     private Button MagicColorButton;
+    public Button savePDF;
 
     public ResultFragment() { }
 
@@ -73,6 +84,8 @@ public class ResultFragment extends Fragment {
         doneButton = (Button) view.findViewById(R.id.doneButton);
         doneButton.setOnClickListener(new DoneButtonClickListener());
         drive = (Button) view.findViewById(R.id.drive_button);
+        savePDF = (Button) view.findViewById(R.id.savePDF);
+        savePDF.setOnClickListener(new SavePDFListener());
 
         PreferenceManager.setDefaultValues(getContext(), R.xml.pref_general, false);
     }
@@ -88,6 +101,119 @@ public class ResultFragment extends Fragment {
         return null;
     }
 
+    public class SavePDFListener implements View.OnClickListener {
+        @Override
+        public void onClick(View v) {
+           /* android.support.v7.app.AlertDialog alertDialog = new android.support.v7.app.AlertDialog.Builder(getContext()).create();
+            alertDialog.setTitle("Invalid Account");
+            alertDialog.setMessage("The specified account does not exist on this device. Please choose a different account in the Settings Menu.");
+            alertDialog.setButton(android.support.v7.app.AlertDialog.BUTTON_NEUTRAL, "OK",
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+            alertDialog.show();
+            */
+            Bitmap bitmap = transformed;
+            if (bitmap == null) {
+                bitmap = original;
+            }
+            File mImageFolder = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), ScanConstants.FOLDER_NAME);
+            try {
+                createImageFileName(bitmap, mImageFolder);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            Document document=new Document();
+            String pdfPath = android.os.Environment.getExternalStorageDirectory().toString();
+            try {
+                String timestamp = new SimpleDateFormat("yyyyMMdd HHmmss").format(new Date());
+                String yourPDF = "/PDF" + timestamp + ".pdf";
+                PdfWriter.getInstance(document, new FileOutputStream(pdfPath + yourPDF));
+                document.open();
+                Image image;
+                image = Image.getInstance(fileName);
+                try {
+                    document.add(new Paragraph("MyCamApp Image Result"));
+                    document.add(image);
+                    document.close();
+                } catch (DocumentException e) {
+                    e.printStackTrace();
+                }
+            } catch (DocumentException e) {
+                e.printStackTrace();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            Toast.makeText(getContext(),"PDF Created", Toast.LENGTH_SHORT);
+
+            MediaScannerConnection.scanFile(getContext(), new String[]{document.toString()}, null,
+                    new MediaScannerConnection.OnScanCompletedListener() {
+                        public void onScanCompleted(String path, Uri uri) {
+                            Log.i("ExternalStorage", "Scanned " + path + ":");
+                            Log.i("ExternalStorage", "-> uri=" + uri);
+                        }
+                    });
+        }
+
+        /*
+         document.open();
+            Image image = null;
+            try {
+                try {
+                    image = Image.getInstance(fileName);
+                } catch (BadElementException e) {
+                    e.printStackTrace();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            try {
+                document.add(new Paragraph("Your Heading for the Image Goes Here"));
+                document.add(image);
+            } catch (DocumentException e) {
+                e.printStackTrace();
+            }
+            document.close();
+        *
+        * */
+
+             /*
+        Document document = new Document();
+        String directoryPath = android.os.Environment.getExternalStorageDirectory().toString();
+
+        try {
+            PdfWriter.getInstance(document, new FileOutputStream(directoryPath + "/example.pdf"));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        document.open();
+        Image image = null;
+
+        try {
+            image = Image.getInstance(directoryPath + "/" + "example.jpg");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        float scaler = ((document.getPageSize().getWidth() - document.leftMargin()
+                - document.rightMargin() - 0) / image.getWidth()) * 100; // 0 means you have no indentation. If you have any, change it.
+        image.scalePercent(scaler);
+        image.setAlignment(Image.ALIGN_CENTER | Image.ALIGN_TOP);
+
+        document.add(image);
+        document.close();
+        */
+
+    }
+
     private Uri getUri() {
         Uri uri = getArguments().getParcelable(ScanConstants.SCANNED_RESULT);
         return uri;
@@ -97,10 +223,13 @@ public class ResultFragment extends Fragment {
         scannedImageView.setImageBitmap(scannedImage);
     }
 
+    public String fileName;
+
     private void createImageFileName(Bitmap bitmap, File folder) throws IOException {
         String timestamp = new SimpleDateFormat("yyyyMMdd HHmmss").format(new Date());
         String prepend = "IMAGE" + timestamp + "_";
         File file = File.createTempFile(prepend, ".jpg", folder);
+        fileName = file.getAbsolutePath();
         try {
             FileOutputStream out = new FileOutputStream(file);
             bitmap.compress(Bitmap.CompressFormat.JPEG, 90, out);
