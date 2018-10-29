@@ -1,40 +1,45 @@
 package com.example.lorenai.mycamapp;
 
-import android.app.Fragment;
-import android.app.FragmentManager;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.SharedPreferences;
+import com.scanlibrary.ScanActivity;
+
+import android.net.Uri;
+import android.util.Log;
 import android.graphics.Bitmap;
 import android.media.MediaScannerConnection;
-import android.net.Uri;
-import android.os.AsyncTask;
-import android.os.Bundle;
-import android.os.Environment;
 import android.preference.PreferenceManager;
-import android.util.Log;
-import android.view.LayoutInflater;
+
+import android.app.Fragment;
+import android.app.FragmentManager;
+
+import android.content.Intent;
+import android.content.SharedPreferences;
+
+import android.os.Bundle;
+import android.os.AsyncTask;
+import android.os.Environment;
+
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.LayoutInflater;
+
+import android.widget.Toast;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.Toast;
 
-import com.itextpdf.text.BadElementException;
-import com.itextpdf.text.Document;
-import com.itextpdf.text.DocumentException;
-import com.itextpdf.text.Image;
-import com.itextpdf.text.Paragraph;
-import com.itextpdf.text.pdf.PdfWriter;
-import com.scanlibrary.ScanActivity;
+import java.util.Date;
+import java.text.SimpleDateFormat;
+import java.net.MalformedURLException;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Image;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.pdf.PdfWriter;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -44,20 +49,22 @@ import static android.app.Activity.RESULT_OK;
 
 public class ResultFragment extends Fragment {
 
+    public Uri savedUri;
+    public String fileName;
+
     private View view;
     private ImageView scannedImageView;
     private static ProgressDialogFragment progressDialogFragment;
-    public Uri savedUri;
 
     private Bitmap original;
     private Bitmap transformed;
 
     public Button drive;
-    private Button bwButton;
-    private Button doneButton;
-    private Button originalButton;
-    private Button grayModeButton;
-    private Button MagicColorButton;
+    public Button bwButton;
+    public Button doneButton;
+    public Button originalButton;
+    public Button grayModeButton;
+    public Button MagicColorButton;
     public Button savePDF;
 
     public ResultFragment() { }
@@ -90,31 +97,9 @@ public class ResultFragment extends Fragment {
         PreferenceManager.setDefaultValues(getContext(), R.xml.pref_general, false);
     }
 
-    private Bitmap getBitmap() {
-        Uri uri = getUri();
-        try {
-            original = Util.getBitmap(getActivity(), uri);
-            return original;
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
     public class SavePDFListener implements View.OnClickListener {
         @Override
         public void onClick(View v) {
-           /* android.support.v7.app.AlertDialog alertDialog = new android.support.v7.app.AlertDialog.Builder(getContext()).create();
-            alertDialog.setTitle("Invalid Account");
-            alertDialog.setMessage("The specified account does not exist on this device. Please choose a different account in the Settings Menu.");
-            alertDialog.setButton(android.support.v7.app.AlertDialog.BUTTON_NEUTRAL, "OK",
-                    new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                        }
-                    });
-            alertDialog.show();
-            */
             Bitmap bitmap = transformed;
             if (bitmap == null) {
                 bitmap = original;
@@ -151,6 +136,7 @@ public class ResultFragment extends Fragment {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+
             Toast.makeText(getContext(),"PDF Created", Toast.LENGTH_SHORT);
 
             MediaScannerConnection.scanFile(getContext(), new String[]{document.toString()}, null,
@@ -161,93 +147,6 @@ public class ResultFragment extends Fragment {
                         }
                     });
         }
-
-        /*
-         document.open();
-            Image image = null;
-            try {
-                try {
-                    image = Image.getInstance(fileName);
-                } catch (BadElementException e) {
-                    e.printStackTrace();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            try {
-                document.add(new Paragraph("Your Heading for the Image Goes Here"));
-                document.add(image);
-            } catch (DocumentException e) {
-                e.printStackTrace();
-            }
-            document.close();
-        *
-        * */
-
-             /*
-        Document document = new Document();
-        String directoryPath = android.os.Environment.getExternalStorageDirectory().toString();
-
-        try {
-            PdfWriter.getInstance(document, new FileOutputStream(directoryPath + "/example.pdf"));
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-
-        document.open();
-        Image image = null;
-
-        try {
-            image = Image.getInstance(directoryPath + "/" + "example.jpg");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        float scaler = ((document.getPageSize().getWidth() - document.leftMargin()
-                - document.rightMargin() - 0) / image.getWidth()) * 100; // 0 means you have no indentation. If you have any, change it.
-        image.scalePercent(scaler);
-        image.setAlignment(Image.ALIGN_CENTER | Image.ALIGN_TOP);
-
-        document.add(image);
-        document.close();
-        */
-
-    }
-
-    private Uri getUri() {
-        Uri uri = getArguments().getParcelable(ScanConstants.SCANNED_RESULT);
-        return uri;
-    }
-
-    public void setScannedImage(Bitmap scannedImage) {
-        scannedImageView.setImageBitmap(scannedImage);
-    }
-
-    public String fileName;
-
-    private void createImageFileName(Bitmap bitmap, File folder) throws IOException {
-        String timestamp = new SimpleDateFormat("yyyyMMdd HHmmss").format(new Date());
-        String prepend = "IMAGE" + timestamp + "_";
-        File file = File.createTempFile(prepend, ".jpg", folder);
-        fileName = file.getAbsolutePath();
-        try {
-            FileOutputStream out = new FileOutputStream(file);
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 90, out);
-            out.flush();
-            out.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        MediaScannerConnection.scanFile(getContext(), new String[]{file.toString()}, null,
-                new MediaScannerConnection.OnScanCompletedListener() {
-                    public void onScanCompleted(String path, Uri uri) {
-                        Log.i("ExternalStorage", "Scanned " + path + ":");
-                        Log.i("ExternalStorage", "-> uri=" + uri);
-                    }
-                });
-
-        savedUri = Uri.fromFile(file);
     }
 
     private class DoneButtonClickListener implements View.OnClickListener {
@@ -411,6 +310,51 @@ public class ResultFragment extends Fragment {
         }
     }
 
+    private Bitmap getBitmap() {
+        Uri uri = getUri();
+        try {
+            original = Util.getBitmap(getActivity(), uri);
+            return original;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private Uri getUri() {
+        Uri uri = getArguments().getParcelable(ScanConstants.SCANNED_RESULT);
+        return uri;
+    }
+
+    public void setScannedImage(Bitmap scannedImage) {
+        scannedImageView.setImageBitmap(scannedImage);
+    }
+
+    private void createImageFileName(Bitmap bitmap, File folder) throws IOException {
+        String timestamp = new SimpleDateFormat("yyyyMMdd HHmmss").format(new Date());
+        String prepend = "IMAGE" + timestamp + "_";
+        File file = File.createTempFile(prepend, ".jpg", folder);
+        fileName = file.getAbsolutePath();
+        try {
+            FileOutputStream out = new FileOutputStream(file);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 90, out);
+            out.flush();
+            out.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        MediaScannerConnection.scanFile(getContext(), new String[]{file.toString()}, null,
+                new MediaScannerConnection.OnScanCompletedListener() {
+                    public void onScanCompleted(String path, Uri uri) {
+                        Log.i("ExternalStorage", "Scanned " + path + ":");
+                        Log.i("ExternalStorage", "-> uri=" + uri);
+                    }
+                });
+
+        savedUri = Uri.fromFile(file);
+    }
+
     protected synchronized void showProgressDialog(String message) {
         if (progressDialogFragment != null && progressDialogFragment.isVisible()) {
             // Before creating another loading dialog, close all opened loading dialogs (if any)
@@ -425,4 +369,5 @@ public class ResultFragment extends Fragment {
     protected synchronized void dismissDialog() {
         progressDialogFragment.dismissAllowingStateLoss();
     }
+
 }

@@ -1,10 +1,10 @@
 package com.example.lorenai.mycamapp;
 
-import android.net.Uri;
+import java.util.Date;
 import java.text.SimpleDateFormat;
 import static android.app.Activity.RESULT_OK;
 
-import java.util.Date;
+import android.net.Uri;
 import android.util.Log;
 
 import android.app.Activity;
@@ -39,13 +39,14 @@ import android.media.MediaScannerConnection;
 
 public class ScanFragment extends Fragment implements CropImageView.OnSetImageUriCompleteListener, CropImageView.OnCropImageCompleteListener{
 
-    private View view;
+    public View view;
     public Uri savedUri;
+    public CropImageView cropImageView;
+
     private Bitmap original;
     private IScanner scanner;
     private Button scanButton;
     private ImageView sourceImageView;
-    public CropImageView cropImageView;
 
     @Override
     public void onAttach(Activity activity) {
@@ -56,14 +57,32 @@ public class ScanFragment extends Fragment implements CropImageView.OnSetImageUr
         this.scanner = (IScanner) activity;
     }
 
+    public ScanFragment() { }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.scan_fragment_layout, null);
         init();
         return view;
     }
+    private void init() {
+        sourceImageView = (ImageView) view.findViewById(R.id.sourceImageView);
+        scanButton = (Button) view.findViewById(R.id.scanButton);
+        scanButton.setOnClickListener(new ScanButtonClickListener());
+        CropImage.activity(getUri()).start(getContext(), this);
+    }
 
-    public ScanFragment() { }
+    private class ScanButtonClickListener implements View.OnClickListener {
+        @Override
+        public void onClick(View v) {
+            if (original == null) {
+                Intent intent = new Intent(getContext(), MainActivity.class);
+                startActivity(intent);
+            } else {
+                scanner.onScanFinish(savedUri);
+            }
+        }
+    }
 
     private void createImageFileName(Bitmap bitmap) throws  IOException {
         File mImageFolder = new File (Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), ScanConstants.FOLDER_NAME);
@@ -92,30 +111,6 @@ public class ScanFragment extends Fragment implements CropImageView.OnSetImageUr
 
     }
 
-    private void init() {
-        sourceImageView = (ImageView) view.findViewById(R.id.sourceImageView);
-        scanButton = (Button) view.findViewById(R.id.scanButton);
-        scanButton.setOnClickListener(new ScanButtonClickListener());
-        CropImage.activity(getUri()).start(getContext(), this);
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
-            CropImage.ActivityResult result = CropImage.getActivityResult(data);
-            if (resultCode == RESULT_OK) {
-                Uri resultUri = result.getUri();
-                try {
-                    original = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), resultUri);
-                    sourceImageView.setImageBitmap(original);
-                    createImageFileName(original);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) { }
-        }
-    }
-
     private Uri getUri() {
         Uri uri = getArguments().getParcelable(ScanConstants.SELECTED_BITMAP);
         return uri;
@@ -134,21 +129,26 @@ public class ScanFragment extends Fragment implements CropImageView.OnSetImageUr
         }
     }
 
-    private class ScanButtonClickListener implements View.OnClickListener {
-        @Override
-        public void onClick(View v) {
-            if (original == null) {
-                Intent intent = new Intent(getContext(), MainActivity.class);
-                startActivity(intent);
-            } else {
-                scanner.onScanFinish(savedUri);
-            }
-        }
-    }
-
     @Override
     public void onResume(){
         super.onResume();
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+            CropImage.ActivityResult result = CropImage.getActivityResult(data);
+            if (resultCode == RESULT_OK) {
+                Uri resultUri = result.getUri();
+                try {
+                    original = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), resultUri);
+                    sourceImageView.setImageBitmap(original);
+                    createImageFileName(original);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) { }
+        }
     }
 
 }

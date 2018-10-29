@@ -1,15 +1,19 @@
 package com.example.lorenai.mycamapp;
 
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.util.Date;
-import android.net.Uri;
-import android.Manifest;
-
-import android.util.Log;
-import android.widget.Button;
-import android.widget.ImageView;
 import java.text.SimpleDateFormat;
+
+import java.util.Date;
+import java.util.ArrayList;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.ByteArrayOutputStream;
+
+import android.net.Uri;
+import android.util.Log;
+import android.Manifest;
+import android.view.ViewGroup;
 import android.provider.MediaStore;
 import android.preference.PreferenceManager;
 
@@ -28,9 +32,11 @@ import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.ByteArrayOutputStream;
+import android.widget.Toast;
+import android.widget.GridView;
+import android.widget.ImageView;
+import android.widget.AdapterView;
+import android.widget.BaseAdapter;
 
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -44,7 +50,6 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.ComponentCallbacks2;
-import android.widget.Toast;
 
 import com.google.android.gms.drive.Drive;
 import com.google.android.gms.drive.DriveApi;
@@ -54,12 +59,6 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.GoogleApiAvailability;
-import com.itextpdf.text.BadElementException;
-import com.itextpdf.text.Document;
-import com.itextpdf.text.DocumentException;
-import com.itextpdf.text.Image;
-import com.itextpdf.text.Paragraph;
-import com.itextpdf.text.pdf.PdfWriter;
 
 public class MainActivity extends AppCompatActivity implements IScanner, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
@@ -74,6 +73,24 @@ public class MainActivity extends AppCompatActivity implements IScanner, GoogleA
 
     private String mCurrentPhotoPath;
     public String[] PERMISSIONS = {Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.INTERNET};
+
+    private GridView gv;
+    private ArrayList<File> list;
+    private ArrayList<File> imageReader(File root) {
+        ArrayList<File> a = new ArrayList<>();
+
+        File[] files = root.listFiles();
+        for(int i = 0; i < files.length; i++) {
+            if(files[i].isDirectory()) {
+                a.addAll(imageReader(files[i]));
+            } else {
+                if(files[i].getName().endsWith(".jpg")) {
+                    a.add(files[i]);
+                }
+            }
+        }
+        return a;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -121,6 +138,60 @@ public class MainActivity extends AppCompatActivity implements IScanner, GoogleA
 
         createImageFolder();
 
+        if(ScanConstants.CROP_URI == "notYet") {
+            File[] checkEmptiness = mImageFolder.listFiles();
+            if (checkEmptiness == null) {
+                list = imageReader(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM));
+            } else if (checkEmptiness.length == 0) {
+                list = imageReader(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM));
+            } else {
+                list = imageReader(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES + "/" + ScanConstants.FOLDER_NAME));
+            }
+
+            gv = (GridView) findViewById(R.id.gridView);
+            gv.setAdapter(new GridAdapter());
+
+            gv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    Uri uriImg = Uri.fromFile(list.get(position));
+                    String uri = uriImg.toString();
+                    startActivity(new Intent(getApplicationContext(), CropImageMainAct.class).putExtra("uri", uri));
+                }
+            });
+        } else {
+            Uri uri = Uri.parse(ScanConstants.CROP_URI);
+            onScanFinish(uri);
+        }
+    }
+
+    class GridAdapter extends BaseAdapter {
+
+        @Override
+        public int getCount() {
+            return list.size();
+        }
+
+        @Override
+        public Object getItem(int position) {
+            return list.get(position);
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return 0;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+
+            convertView = getLayoutInflater().inflate(R.layout.single_grid, parent,false);
+            ImageView iv = (ImageView) convertView.findViewById(R.id.imageViewPic);
+
+            iv.setImageURI( Uri.parse(getItem(position).toString()));
+
+            return convertView;
+        }
     }
 
     private void init() {
@@ -163,6 +234,9 @@ public class MainActivity extends AppCompatActivity implements IScanner, GoogleA
 
     @Override
     public void onScanFinish(Uri uri) {
+        if(ScanConstants.CROP_URI != "notYet") {
+            setContentView(R.layout.scan_layout);
+        }
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
         ResultFragment fragment = new ResultFragment();
         Bundle bundle = new Bundle();
@@ -300,11 +374,6 @@ public class MainActivity extends AppCompatActivity implements IScanner, GoogleA
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
             try {
-                /*
-                if(requestCode == REQUEST_CODE_CREATOR) {
-                    Log.i(TAG, "Image successfully saved.");
-                }
-                */
                 if(requestCode == REQUEST_IMAGE_CAPTURE) {
                     Bitmap bitmap = uriToBitmap(getApplicationContext() , Uri.parse(mCurrentPhotoPath));
                     if(bitmap != null) {
@@ -330,15 +399,14 @@ public class MainActivity extends AppCompatActivity implements IScanner, GoogleA
         super.onResume();
     }
 
-    // GOOGLE DRIVE HERE
+    // Google Drive Here
 
     public DriveFile file;
     private GoogleApiClient mGoogleApiClient;
-    private static final String TAG = "Google Drive Activity";
 
     private static final  int REQUEST_CODE_CREATOR = 2;
     private static final int REQUEST_CODE_RESOLUTION = 3;
-
+    private static final String TAG = "Google Drive Activity";
 
     public void connectDude() {
         if (drive_email.isEmpty()) {
@@ -355,40 +423,6 @@ public class MainActivity extends AppCompatActivity implements IScanner, GoogleA
             }
             mGoogleApiClient.connect();
         }
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        if (mGoogleApiClient != null) {
-            mGoogleApiClient.disconnect();
-        }
-        super.onPause();
-    }
-
-    @Override
-    public void onConnectionFailed(ConnectionResult result) {
-        // Called whenever the API client fails to connect.
-        Log.i(TAG, "GoogleApiClient connection failed: " + result.toString());
-        if (!result.hasResolution()) {
-            // show the localized error dialog.
-            GoogleApiAvailability.getInstance().getErrorDialog(this, result.getErrorCode(), 0).show();
-            return;
-        }
-
-        try {
-            result.startResolutionForResult(this, REQUEST_CODE_RESOLUTION);
-        } catch (IntentSender.SendIntentException e) {
-            Log.e(TAG, "Exception while starting resolution activity", e);
-        }
-    }
-
-    @Override
-    public void onConnected(Bundle connectionHint) { }
-
-    @Override
-    public void onConnectionSuspended(int cause) {
-        Log.i(TAG, "GoogleApiClient connection suspended");
     }
 
     public void onClickCreateFile(View view) {
@@ -409,21 +443,8 @@ public class MainActivity extends AppCompatActivity implements IScanner, GoogleA
             saveFileToDrive();
         }
     }
-       /*
-            AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
-            alertDialog.setTitle("Can't connect");
-            alertDialog.setMessage("You are not connected with a Google Drive account.");
-            alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
-                    new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                        }
-                    });
-            alertDialog.show();
-     */
 
     private void saveFileToDrive() {
-        // Start by creating a new contents, and setting a callback.
         scannedImageView = (ImageView) findViewById(R.id.scannedImage);
         Log.i(TAG, "Creating new contents.");
         final Bitmap image = ((BitmapDrawable)scannedImageView.getDrawable()).getBitmap();
@@ -431,18 +452,12 @@ public class MainActivity extends AppCompatActivity implements IScanner, GoogleA
                 .setResultCallback(new ResultCallback<DriveApi.DriveContentsResult>() {
                     @Override
                     public void onResult(DriveApi.DriveContentsResult result) {
-                        // If the operation was not successful, we cannot do anything
-                        // and must
-                        // fail.
                         if (!result.getStatus().isSuccess()) {
                             Log.i(TAG, "Failed to create new contents.");
                             return;
                         }
-                        // Otherwise, we can write our data to the new contents.
                         Log.i(TAG, "New contents created.");
-                        // Get an output stream for the contents.
                         OutputStream outputStream = result.getDriveContents().getOutputStream();
-                        // Write the bitmap data from it.
                         ByteArrayOutputStream bitmapStream = new ByteArrayOutputStream();
                         image.compress(Bitmap.CompressFormat.PNG, 100, bitmapStream);
                         try {
@@ -450,10 +465,7 @@ public class MainActivity extends AppCompatActivity implements IScanner, GoogleA
                         } catch (IOException e1) {
                             Log.i(TAG, "Unable to write file contents.");
                         }
-                        // Create the initial metadata - MIME type and title.
-                        // Note that the user will be able to change the title later.
                         MetadataChangeSet metadataChangeSet = new MetadataChangeSet.Builder().setMimeType("image/jpeg").setTitle("Android Photo.png").build();
-                        // Create an intent for the file chooser, and start it.
                         IntentSender intentSender = Drive.DriveApi
                                 .newCreateFileActivityBuilder()
                                 .setInitialMetadata(metadataChangeSet)
@@ -468,4 +480,51 @@ public class MainActivity extends AppCompatActivity implements IScanner, GoogleA
                 });
     }
 
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (mGoogleApiClient != null) {
+            mGoogleApiClient.disconnect();
+        }
+        super.onPause();
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult result) {
+        Log.i(TAG, "GoogleApiClient connection failed: " + result.toString());
+        if (!result.hasResolution()) {
+            GoogleApiAvailability.getInstance().getErrorDialog(this, result.getErrorCode(), 0).show();
+            return;
+        }
+
+        try {
+            result.startResolutionForResult(this, REQUEST_CODE_RESOLUTION);
+        } catch (IntentSender.SendIntentException e) {
+            Log.e(TAG, "Exception while starting resolution activity", e);
+        }
+    }
+
+    @Override
+    public void onConnected(Bundle connectionHint) { }
+
+    @Override
+    public void onConnectionSuspended(int cause) {
+        Log.i(TAG, "GoogleApiClient connection suspended");
+    }
+
 }
+
+// Alert Dialog
+
+       /*
+            AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
+            alertDialog.setTitle("Can't connect");
+            alertDialog.setMessage("You are not connected with a Google Drive account.");
+            alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+            alertDialog.show();
+     */

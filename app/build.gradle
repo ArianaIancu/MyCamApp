@@ -45,4 +45,5 @@ dependencies {
     implementation files('libs/additionnal.jar')
     implementation files('libs/mail.jar')
     implementation 'com.itextpdf:itextg:5.5.10'
+    implementation 'com.android.support:gridlayout-v7:27.1.1'
 }

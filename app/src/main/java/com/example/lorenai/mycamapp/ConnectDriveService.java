@@ -1,34 +1,34 @@
 package com.example.lorenai.mycamapp;
 
+import java.util.Set;
+import java.util.HashSet;
+
+import android.util.Log;
+import android.preference.PreferenceManager;
+import android.support.v7.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
 
-import android.preference.PreferenceManager;
-import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
-
+import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.common.api.Scope;
-import com.google.android.gms.drive.Drive;
-import com.google.android.gms.drive.DriveClient;
 
-import com.google.android.gms.drive.DriveId;
-import com.google.android.gms.drive.DriveResourceClient;
-import com.google.android.gms.drive.OpenFileActivityOptions;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.TaskCompletionSource;
-
-import java.util.HashSet;
-import java.util.Set;
+import com.google.android.gms.drive.Drive;
+import com.google.android.gms.drive.DriveId;
+import com.google.android.gms.drive.DriveClient;
+import com.google.android.gms.drive.DriveResourceClient;
+import com.google.android.gms.drive.OpenFileActivityOptions;
 
 /**
  * An abstract activity that handles authorization and connection to the Drive services.
  */
 public abstract class ConnectDriveService extends AppCompatActivity {
+
     private static final String TAG = "BaseDriveActivity";
 
     /**
@@ -151,7 +151,6 @@ public abstract class ConnectDriveService extends AppCompatActivity {
         mDriveResourceClient = Drive.getDriveResourceClient(getApplicationContext(), signInAccount);
         onDriveClientReady();
     }
-
 
     /**
      * Called after the user has signed in and the Drive client has been initialized.

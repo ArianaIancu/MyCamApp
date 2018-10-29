@@ -64,7 +64,7 @@ public class PickImageFragment extends Fragment {
                     openMediaContent();
                     return true;
                 case R.id.camera:
-                    Intent i = new Intent(getActivity(), MainActivity.class);
+                                     Intent i = new Intent(getActivity(), MainActivity.class);
                     startActivity(i);
                     return true;
                 case R.id.settings:
@@ -96,6 +96,20 @@ public class PickImageFragment extends Fragment {
         fileUri = Uri.parse(getArguments().getString("IMG"));
         Bitmap bitmap = uriToBitmap(getContext() , fileUri);
         postImagePick(bitmap);
+    }
+
+    public void postImagePick(Bitmap bitmap) {
+        Uri uri = Util.getUri(getActivity(), bitmap);
+        bitmap.recycle();
+        scanner.onBitmapSelect(uri);
+    }
+
+    public Bitmap getBitmap(Uri selectedImg) throws IOException {
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inSampleSize = 3;
+        AssetFileDescriptor fileDescriptor = getActivity().getContentResolver().openAssetFileDescriptor(selectedImg, "r");
+        Bitmap original = BitmapFactory.decodeFileDescriptor(fileDescriptor.getFileDescriptor(), null, options);
+        return original;
     }
 
     public  Bitmap uriToBitmap(Context c, Uri uri) {
@@ -137,17 +151,4 @@ public class PickImageFragment extends Fragment {
         }
     }
 
-    public void postImagePick(Bitmap bitmap) {
-        Uri uri = Util.getUri(getActivity(), bitmap);
-        bitmap.recycle();
-        scanner.onBitmapSelect(uri);
-    }
-
-    public Bitmap getBitmap(Uri selectedImg) throws IOException {
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inSampleSize = 3;
-        AssetFileDescriptor fileDescriptor = getActivity().getContentResolver().openAssetFileDescriptor(selectedImg, "r");
-        Bitmap original = BitmapFactory.decodeFileDescriptor(fileDescriptor.getFileDescriptor(), null, options);
-        return original;
-    }
 }

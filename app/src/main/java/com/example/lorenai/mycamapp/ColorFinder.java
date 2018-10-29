@@ -1,19 +1,18 @@
 package com.example.lorenai.mycamapp;
 
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.net.Uri;
-import android.os.StrictMode;
-import android.view.View;
-
+import java.util.Date;
 import java.text.SimpleDateFormat;
 
-import android.preference.PreferenceManager;
-import android.media.MediaScannerConnection;
-
-import java.util.Date;
-
+import android.net.Uri;
 import android.util.Log;
+import android.view.View;
+import android.os.StrictMode;
+import android.support.v7.graphics.Palette;
+import android.media.MediaScannerConnection;
+import android.preference.PreferenceManager;
+
+import android.content.Intent;
+import android.content.DialogInterface;
 
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
@@ -32,18 +31,17 @@ import java.io.OutputStream;
 import java.io.FileOutputStream;
 import java.io.ByteArrayOutputStream;
 
+import android.widget.Toast;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
-import android.support.v7.graphics.Palette;
-import android.widget.Toast;
 
 import com.google.android.gms.drive.Drive;
+import com.google.android.gms.drive.DriveId;
 import com.google.android.gms.drive.DriveApi;
 import com.google.android.gms.drive.DriveFile;
 import com.google.android.gms.drive.DriveFolder;
-import com.google.android.gms.drive.DriveId;
 import com.google.android.gms.drive.MetadataChangeSet;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.ResultCallback;
@@ -53,18 +51,17 @@ import com.google.android.gms.common.GoogleApiAvailability;
 public class ColorFinder extends ConnectDriveService implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     public Uri savedUri;
+    public RelativeLayout outerLayout;
 
     private Bitmap original;
-
-    public RelativeLayout outerLayout;
-    private int outerLayoutOriginal;
-
-    public TextView titleText;
-    public TextView bodyText;
     private ImageView scannedImageView;
 
-    private int titleTextOriginal;
+    public TextView bodyText;
+    public TextView titleText;
+
     private int bodyTextOriginal;
+    private int titleTextOriginal;
+    private int outerLayoutOriginal;
 
     private Button doneButton;
     private Button saveColorDrive;
@@ -169,73 +166,6 @@ public class ColorFinder extends ConnectDriveService implements GoogleApiClient.
                 }
             }
         });
-    }
-
-    private class ChangeResetColorListener implements View.OnClickListener {
-        @Override
-        public void onClick(View v) {
-            bodyText.setText(colorNameOriginal);
-            colorName = colorNameOriginal;
-            outerLayout.setBackgroundColor(outerLayoutOriginal);
-            titleText.setTextColor(titleTextOriginal);
-            bodyText.setTextColor(bodyTextOriginal);
-        }
-    }
-
-    private class ChangeRedColorListener implements View.OnClickListener {
-        @Override
-        public void onClick(View v) {
-            bodyText.setText("Red");
-            colorName = "Red";
-            outerLayout.setBackgroundColor(getResources().getColor(R.color.light_red));
-            titleText.setTextColor(getResources().getColor(R.color.black));
-            bodyText.setTextColor(getResources().getColor(R.color.red));
-        }
-    }
-
-    private class ChangeGreenColorListener implements View.OnClickListener {
-        @Override
-        public void onClick(View v) {
-            bodyText.setText("Green");
-            colorName = "Green";
-            outerLayout.setBackgroundColor(getResources().getColor(R.color.light_green));
-            titleText.setTextColor(getResources().getColor(R.color.black));
-            bodyText.setTextColor(getResources().getColor(R.color.green));
-
-        }
-    }
-
-    private class ChangeBlueColorListener implements View.OnClickListener {
-        @Override
-        public void onClick(View v) {
-            bodyText.setText("Blue");
-            colorName = "Blue";
-            outerLayout.setBackgroundColor(getResources().getColor(R.color.blue));
-            titleText.setTextColor(getResources().getColor(R.color.black));
-            bodyText.setTextColor(getResources().getColor(R.color.colorPrimaryDark));
-        }
-    }
-
-    private class ChangeYOColorListener implements View.OnClickListener {
-        @Override
-        public void onClick(View v) {
-            bodyText.setText("Yellow/Orange");
-            colorName = "Yellow/Orange";
-            outerLayout.setBackgroundColor(getResources().getColor(R.color.yellow_orange));
-            titleText.setTextColor(getResources().getColor(R.color.black));
-            bodyText.setTextColor(getResources().getColor(R.color.just_orange));
-        }
-    }
-
-    private class ChangePPColorListener implements View.OnClickListener {
-        @Override
-        public void onClick(View v) {
-            bodyText.setText("Purple/Pink");
-            colorName = "Purple/Pink";
-            outerLayout.setBackgroundColor(getResources().getColor(R.color.pink_purple));
-            titleText.setTextColor(getResources().getColor(R.color.black));
-            bodyText.setTextColor(getResources().getColor(R.color.just_purple));
-        }
     }
 
     private Bitmap getBitmap() {
@@ -357,18 +287,86 @@ public class ColorFinder extends ConnectDriveService implements GoogleApiClient.
 
     }
 
+    private class ChangeResetColorListener implements View.OnClickListener {
+        @Override
+        public void onClick(View v) {
+            bodyText.setText(colorNameOriginal);
+            colorName = colorNameOriginal;
+            outerLayout.setBackgroundColor(outerLayoutOriginal);
+            titleText.setTextColor(titleTextOriginal);
+            bodyText.setTextColor(bodyTextOriginal);
+        }
+    }
+
+    private class ChangeRedColorListener implements View.OnClickListener {
+        @Override
+        public void onClick(View v) {
+            bodyText.setText("Red");
+            colorName = "Red";
+            outerLayout.setBackgroundColor(getResources().getColor(R.color.light_red));
+            titleText.setTextColor(getResources().getColor(R.color.black));
+            bodyText.setTextColor(getResources().getColor(R.color.red));
+        }
+    }
+
+    private class ChangeGreenColorListener implements View.OnClickListener {
+        @Override
+        public void onClick(View v) {
+            bodyText.setText("Green");
+            colorName = "Green";
+            outerLayout.setBackgroundColor(getResources().getColor(R.color.light_green));
+            titleText.setTextColor(getResources().getColor(R.color.black));
+            bodyText.setTextColor(getResources().getColor(R.color.green));
+
+        }
+    }
+
+    private class ChangeBlueColorListener implements View.OnClickListener {
+        @Override
+        public void onClick(View v) {
+            bodyText.setText("Blue");
+            colorName = "Blue";
+            outerLayout.setBackgroundColor(getResources().getColor(R.color.blue));
+            titleText.setTextColor(getResources().getColor(R.color.black));
+            bodyText.setTextColor(getResources().getColor(R.color.colorPrimaryDark));
+        }
+    }
+
+    private class ChangeYOColorListener implements View.OnClickListener {
+        @Override
+        public void onClick(View v) {
+            bodyText.setText("Yellow/Orange");
+            colorName = "Yellow/Orange";
+            outerLayout.setBackgroundColor(getResources().getColor(R.color.yellow_orange));
+            titleText.setTextColor(getResources().getColor(R.color.black));
+            bodyText.setTextColor(getResources().getColor(R.color.just_orange));
+        }
+    }
+
+    private class ChangePPColorListener implements View.OnClickListener {
+        @Override
+        public void onClick(View v) {
+            bodyText.setText("Purple/Pink");
+            colorName = "Purple/Pink";
+            outerLayout.setBackgroundColor(getResources().getColor(R.color.pink_purple));
+            titleText.setTextColor(getResources().getColor(R.color.black));
+            bodyText.setTextColor(getResources().getColor(R.color.just_purple));
+        }
+    }
+
     @Override
     public void onResume() {
         super.onResume();
     }
 
-    // GOOGLE DRIVE HERE
+    // Google Drive Here
+
+    public DriveFile file;
+
+    private GoogleApiClient mGoogleApiClient;
 
     private String drive_email;
     private String drive_created;
-    public DriveFile file;
-    private GoogleApiClient mGoogleApiClient;
-    private static final String TAG = "Google Drive Activity";
 
     public DriveId fId;
     public DriveId fIdRed;
@@ -378,15 +376,15 @@ public class ColorFinder extends ConnectDriveService implements GoogleApiClient.
     public DriveId fIdYO;
     public DriveId fIdDefault;
 
-    String folderRed = "MyCamAppRed";
-    String folderBlue = "MyCamAppBlue";
-    String folderGreen = "MyCamAppGreen";
-    String folderPP = "MyCamAppPurple&Pink";
-    String folderYO = "MyCamAppYellow&Orange";
+    public String folderRed = "MyCamAppRed";
+    public String folderBlue = "MyCamAppBlue";
+    public String folderGreen = "MyCamAppGreen";
+    public String folderPP = "MyCamAppPurple&Pink";
+    public String folderYO = "MyCamAppYellow&Orange";
 
     private static final int REQUEST_CODE_CREATOR = 2;
     private static final int REQUEST_CODE_RESOLUTION = 3;
-
+    private static final String TAG = "Google Drive Activity";
 
     public void connectDude() {
         if (drive_email.isEmpty()) {
@@ -403,42 +401,6 @@ public class ColorFinder extends ConnectDriveService implements GoogleApiClient.
             }
             mGoogleApiClient.connect();
         }
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        if (mGoogleApiClient != null) {
-            mGoogleApiClient.disconnect();
-        }
-        super.onPause();
-    }
-
-    @Override
-    public void onConnectionFailed(ConnectionResult result) {
-        // Called whenever the API client fails to connect.
-        Log.i(TAG, "GoogleApiClient connection failed: " + result.toString());
-        if (!result.hasResolution()) {
-            // show the localized error dialog.
-            GoogleApiAvailability.getInstance().getErrorDialog(this, result.getErrorCode(), 0).show();
-            return;
-        }
-
-        try {
-            result.startResolutionForResult(this, REQUEST_CODE_RESOLUTION);
-        } catch (IntentSender.SendIntentException e) {
-            Log.e(TAG, "Exception while starting resolution activity", e);
-        }
-    }
-
-
-    @Override
-    public void onConnected(Bundle connectionHint) {
-    }
-
-    @Override
-    public void onConnectionSuspended(int cause) {
-        Log.i(TAG, "GoogleApiClient connection suspended");
     }
 
     public void createFile() {
@@ -486,7 +448,6 @@ public class ColorFinder extends ConnectDriveService implements GoogleApiClient.
     }
 
     private void saveFileToDrive() {
-        // Get the Drive folder ID from Shared Preference
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         if (colorName == "Red") {
             fId = DriveId.decodeFromString(preferences.getString("fIdRed", ""));
@@ -501,25 +462,18 @@ public class ColorFinder extends ConnectDriveService implements GoogleApiClient.
         } else {
             fId = DriveId.decodeFromString(preferences.getString("fIdDefault", ""));
         }
-        // Start by creating a new contents, and setting a callback.
         Log.i(TAG, "Creating new contents.");
         final Bitmap image = ((BitmapDrawable) scannedImageView.getDrawable()).getBitmap();
         Drive.DriveApi.newDriveContents(mGoogleApiClient)
                 .setResultCallback(new ResultCallback<DriveApi.DriveContentsResult>() {
                     @Override
                     public void onResult(DriveApi.DriveContentsResult result) {
-                        // If the operation was not successful, we cannot do anything
-                        // and must
-                        // fail.
                         if (!result.getStatus().isSuccess()) {
                             Log.i(TAG, "Failed to create new contents.");
                             return;
                         }
-                        // Otherwise, we can write our data to the new contents.
                         Log.i(TAG, "New contents created.");
-                        // Get an output stream for the contents.
                         OutputStream outputStream = result.getDriveContents().getOutputStream();
-                        // Write the bitmap data from it.
                         ByteArrayOutputStream bitmapStream = new ByteArrayOutputStream();
                         image.compress(Bitmap.CompressFormat.PNG, 100, bitmapStream);
                         try {
@@ -527,10 +481,7 @@ public class ColorFinder extends ConnectDriveService implements GoogleApiClient.
                         } catch (IOException e1) {
                             Log.i(TAG, "Unable to write file contents.");
                         }
-                        // Create the initial metadata - MIME type and title.
-                        // Note that the user will be able to change the title later.
                         MetadataChangeSet metadataChangeSet = new MetadataChangeSet.Builder().setMimeType("image/jpeg").setTitle("Android Photo.png").build();
-                        // Create an intent for the file chooser, and start it.
                         IntentSender intentSender = Drive.DriveApi
                                 .newCreateFileActivityBuilder()
                                 .setInitialMetadata(metadataChangeSet)
@@ -544,10 +495,6 @@ public class ColorFinder extends ConnectDriveService implements GoogleApiClient.
                         }
                     }
                 });
-    }
-
-    @Override
-    protected void onDriveClientReady() {
     }
 
     // Create Drive Folders
@@ -695,5 +642,41 @@ public class ColorFinder extends ConnectDriveService implements GoogleApiClient.
             //        finish();
                 });
     }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (mGoogleApiClient != null) {
+            mGoogleApiClient.disconnect();
+        }
+        super.onPause();
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult result) {
+        Log.i(TAG, "GoogleApiClient connection failed: " + result.toString());
+        if (!result.hasResolution()) {
+            GoogleApiAvailability.getInstance().getErrorDialog(this, result.getErrorCode(), 0).show();
+            return;
+        }
+
+        try {
+            result.startResolutionForResult(this, REQUEST_CODE_RESOLUTION);
+        } catch (IntentSender.SendIntentException e) {
+            Log.e(TAG, "Exception while starting resolution activity", e);
+        }
+    }
+
+    @Override
+    public void onConnected(Bundle connectionHint) {
+    }
+
+    @Override
+    public void onConnectionSuspended(int cause) {
+        Log.i(TAG, "GoogleApiClient connection suspended");
+    }
+
+    @Override
+    protected void onDriveClientReady() { }
 
 }

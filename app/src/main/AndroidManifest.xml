@@ -58,7 +58,8 @@
                 android:value="com.example.lorenai.mycamapp.MainActivity" />
         </activity>
         <activity android:name=".ColorFinder" />
-        <activity android:name=".ConnectDriveService"></activity>
+        <activity android:name=".ConnectDriveService" />
+        <activity android:name=".CropImageMainAct"></activity>
     </application>
 
 </manifest>
