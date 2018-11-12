@@ -44,7 +44,6 @@ public class CropImageMainAct extends AppCompatActivity implements CropImageView
         String prepend = "IMAGE" + timestamp + "_";
         File file = File.createTempFile(prepend,".jpg", mImageFolder);
         savedUri = Uri.fromFile(file);
-        //  getActivity().finish();
         try {
             FileOutputStream out = new FileOutputStream(file);
             bitmap.compress(Bitmap.CompressFormat.JPEG, 90, out);

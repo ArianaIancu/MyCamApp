@@ -43,10 +43,6 @@ import com.itextpdf.text.pdf.PdfWriter;
 
 import static android.app.Activity.RESULT_OK;
 
-/**
- * Created by jhansi on 29/03/15.
- */
-
 public class ResultFragment extends Fragment {
 
     public Uri savedUri;
@@ -137,7 +133,7 @@ public class ResultFragment extends Fragment {
                 e.printStackTrace();
             }
 
-            Toast.makeText(getContext(),"PDF Created", Toast.LENGTH_SHORT);
+            Toast.makeText(getContext(),"PDF Created", Toast.LENGTH_SHORT).show();
 
             MediaScannerConnection.scanFile(getContext(), new String[]{document.toString()}, null,
                     new MediaScannerConnection.OnScanCompletedListener() {

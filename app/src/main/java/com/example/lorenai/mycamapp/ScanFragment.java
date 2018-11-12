@@ -33,10 +33,6 @@ import android.graphics.Bitmap;
 import android.provider.MediaStore;
 import android.media.MediaScannerConnection;
 
-/**
- * Created by jhansi on 29/03/15.
- */
-
 public class ScanFragment extends Fragment implements CropImageView.OnSetImageUriCompleteListener, CropImageView.OnCropImageCompleteListener{
 
     public View view;
@@ -90,7 +86,6 @@ public class ScanFragment extends Fragment implements CropImageView.OnSetImageUr
         String prepend = "IMAGE" + timestamp + "_";
         File file = File.createTempFile(prepend,".jpg", mImageFolder);
         savedUri = Uri.fromFile(file);
-      //  getActivity().finish();
         try {
             FileOutputStream out = new FileOutputStream(file);
             bitmap.compress(Bitmap.CompressFormat.JPEG, 90, out);

@@ -72,12 +72,12 @@ public class ColorFinder extends ConnectDriveService implements GoogleApiClient.
     private Button changePP;
     private Button changeReset;
 
-    private File mImageFolderB; // Albastru
-    private File mImageFolderG; // Verde
-    private File mImageFolderR; // Rosu
-    private File mImageFolderYO; // Galben + Portocaliu
-    private File mImageFolderPP; // Purple + Pink
-    private File mImageFolder; // Everything else
+    private File mImageFolderB; // Blue
+    private File mImageFolderG; // Green
+    private File mImageFolderR; // Red
+    private File mImageFolderYO; // Yellow&Orange
+    private File mImageFolderPP; // Purple&Pink
+    private File mImageFolder; // Everything else(Default)
 
     static public float[] color;
     static public String colorName;
@@ -515,11 +515,9 @@ public class ColorFinder extends ConnectDriveService implements GoogleApiClient.
                     editor.putString("fIdRed", String.valueOf(fIdRed));
                     editor.apply();
                     Log.i(TAG, "Created folder");
-                //    finish();
                 })
                 .addOnFailureListener(this, e -> {
                     Log.e(TAG, "Unable to create folder", e);
-                  //  finish();
                 });
     }
 
@@ -539,11 +537,9 @@ public class ColorFinder extends ConnectDriveService implements GoogleApiClient.
                     editor.putString("fIdBlue", String.valueOf(fIdBlue));
                     editor.apply();
                     Log.i(TAG, "Created folder");
-            //        finish();
                 })
                 .addOnFailureListener(this, e -> {
                     Log.e(TAG, "Unable to create folder", e);
-                 //   finish();
                 });
     }
 
@@ -563,11 +559,9 @@ public class ColorFinder extends ConnectDriveService implements GoogleApiClient.
                     editor.putString("fIdGreen", String.valueOf(fIdGreen));
                     editor.apply();
                     Log.i(TAG, "Created folder");
-            //        finish();
                 })
                 .addOnFailureListener(this, e -> {
                     Log.e(TAG, "Unable to create folder", e);
-              //      finish();
                 });
     }
 
@@ -587,11 +581,9 @@ public class ColorFinder extends ConnectDriveService implements GoogleApiClient.
                     editor.putString("fIdPP", String.valueOf(fIdPP));
                     editor.apply();
                     Log.i(TAG, "Created folder");
-              //      finish();
                 })
                 .addOnFailureListener(this, e -> {
                     Log.e(TAG, "Unable to create folder", e);
-               //     finish();
                 });
     }
 
@@ -611,11 +603,9 @@ public class ColorFinder extends ConnectDriveService implements GoogleApiClient.
                     editor.putString("fIdYO", String.valueOf(fIdYO));
                     editor.apply();
                     Log.i(TAG, "Created folder");
-            //        finish();
                 })
                 .addOnFailureListener(this, e -> {
                     Log.e(TAG, "Unable to create folder", e);
-            //        finish();
                 });
     }
 
@@ -635,11 +625,9 @@ public class ColorFinder extends ConnectDriveService implements GoogleApiClient.
                     editor.putString("fIdDefault", String.valueOf(fIdDefault));
                     editor.apply();
                     Log.i(TAG, "Created folder");
-               //     finish();
                 })
                 .addOnFailureListener(this, e -> {
                     Log.e(TAG, "Unable to create folder", e);
-            //        finish();
                 });
     }
 

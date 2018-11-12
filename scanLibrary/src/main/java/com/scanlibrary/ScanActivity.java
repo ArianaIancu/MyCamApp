@@ -4,10 +4,6 @@ import android.os.Bundle;
 import android.app.Activity;
 import android.graphics.Bitmap;
 
-/**
- * Created by jhansi on 28/03/15.
- */
-
 public class ScanActivity extends Activity {
 
     @Override

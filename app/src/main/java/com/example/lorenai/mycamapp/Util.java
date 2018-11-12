@@ -8,10 +8,6 @@ import android.provider.MediaStore;
 import java.io.IOException;
 import java.io.ByteArrayOutputStream;
 
-/**
- * Created by jhansi on 05/04/15.
- */
-
 public class Util {
 
     private Util() { }

@@ -69,7 +69,6 @@ public class MainActivity extends AppCompatActivity implements IScanner, GoogleA
 
     public int PERMISSION_ALL = 1;
     static final int REQUEST_IMAGE_CAPTURE = 1;
-    private static String drive_email;
 
     private String mCurrentPhotoPath;
     public String[] PERMISSIONS = {Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.INTERNET};
@@ -124,11 +123,8 @@ public class MainActivity extends AppCompatActivity implements IScanner, GoogleA
             ActivityCompat.requestPermissions(this, PERMISSIONS, PERMISSION_ALL);
         }
 
-        //drive = (Button) findViewById(R.id.drive_button);
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
-
-        //navigation.setSelectedItemId(R.id.camera);
 
         PreferenceManager.setDefaultValues(this, R.xml.pref_general, false);
         PreferenceManager.setDefaultValues(this, R.xml.pref_drive, false);
@@ -370,24 +366,6 @@ public class MainActivity extends AppCompatActivity implements IScanner, GoogleA
         return null;
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-
-            try {
-                if(requestCode == REQUEST_IMAGE_CAPTURE) {
-                    Bitmap bitmap = uriToBitmap(getApplicationContext() , Uri.parse(mCurrentPhotoPath));
-                    if(bitmap != null) {
-                        bitmap.recycle();
-                        CODE_BUNDLE.putInt("Gal", 4);
-                        CODE_BUNDLE.putString("IMG", mCurrentPhotoPath);
-                        init();
-                    }
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-    }
-
     private void addPicToGallery(Uri uri, java.io.File imageFile) {
         Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, uri);
         mediaScanIntent.setData(Uri.fromFile(imageFile));
@@ -399,6 +377,24 @@ public class MainActivity extends AppCompatActivity implements IScanner, GoogleA
         super.onResume();
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        try {
+            if(requestCode == REQUEST_IMAGE_CAPTURE) {
+                Bitmap bitmap = uriToBitmap(getApplicationContext() , Uri.parse(mCurrentPhotoPath));
+                if(bitmap != null) {
+                    bitmap.recycle();
+                    CODE_BUNDLE.putInt("Gal", 4);
+                    CODE_BUNDLE.putString("IMG", mCurrentPhotoPath);
+                    init();
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     // Google Drive Here
 
     public DriveFile file;
@@ -406,6 +402,8 @@ public class MainActivity extends AppCompatActivity implements IScanner, GoogleA
 
     private static final  int REQUEST_CODE_CREATOR = 2;
     private static final int REQUEST_CODE_RESOLUTION = 3;
+
+    private static String drive_email;
     private static final String TAG = "Google Drive Activity";
 
     public void connectDude() {
@@ -514,7 +512,7 @@ public class MainActivity extends AppCompatActivity implements IScanner, GoogleA
 
 }
 
-// Alert Dialog
+// Alert Dialog Example
 
        /*
             AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();

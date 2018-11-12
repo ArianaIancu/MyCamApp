@@ -3,8 +3,8 @@ package com.example.lorenai.mycamapp;
 import android.net.Uri;
 import android.util.Log;
 import android.os.Bundle;
-import android.view.MenuItem;
 import android.provider.MediaStore;
+import android.support.v4.content.FileProvider;
 
 import java.io.File;
 import java.io.IOException;
@@ -22,14 +22,6 @@ import android.view.LayoutInflater;
 import android.content.Intent;
 import android.content.Context;
 import android.content.res.AssetFileDescriptor;
-
-import android.support.annotation.NonNull;
-import android.support.v4.content.FileProvider;
-import android.support.design.widget.BottomNavigationView;
-
-/**
- * Created by jhansi on 04/04/15.
- */
 
 public class PickImageFragment extends Fragment {
 
@@ -49,32 +41,9 @@ public class PickImageFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.pick_image_fragment, null);
-        BottomNavigationView navigation = (BottomNavigationView) view.findViewById(R.id.navigation2);
-        navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
-
         handleIntentPreference();
         return view;
     }
-
-    private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener = new BottomNavigationView.OnNavigationItemSelectedListener() {
-        @Override
-        public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-            switch (item.getItemId()) {
-                case R.id.galery:
-                    openMediaContent();
-                    return true;
-                case R.id.camera:
-                                     Intent i = new Intent(getActivity(), MainActivity.class);
-                    startActivity(i);
-                    return true;
-                case R.id.settings:
-                    Intent sIntent = new Intent(getContext(), SettingsActivity.class);
-                    startActivity(sIntent);
-                    return true;
-            }
-            return false;
-        }
-    };
 
     private void handleIntentPreference() {
         int preference = getArguments().getInt("Gal");
