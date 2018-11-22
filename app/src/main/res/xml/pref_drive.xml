@@ -1,9 +1,6 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     android:key="drivePref">
 
-    <Preference
-        android:title="@string/drive_email_description" />
-
     <EditTextPreference
         android:capitalize="words"
         android:defaultValue="MyDriveEmail@gmail.com"

@@ -1,7 +1,5 @@
 package com.example.lorenai.mycamapp;
 
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
 
 import java.util.Date;
@@ -12,7 +10,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.ByteArrayOutputStream;
 
-import android.app.Activity;
 import android.net.Uri;
 import android.util.Log;
 import android.Manifest;
@@ -114,6 +111,7 @@ public class MainActivity extends AppCompatActivity implements IScanner, GoogleA
                             SharedPreferences.Editor editor = sharedPreferences.edit();
                             editor.putBoolean("agreed", true);
                             editor.commit();
+                            onCreateStuffToDo();
                         }
                     })
                     .setNegativeButton("Exit", new DialogInterface.OnClickListener() {
@@ -126,23 +124,26 @@ public class MainActivity extends AppCompatActivity implements IScanner, GoogleA
                     .setCancelable(false)
                     .show();
         }
-
         if(!hasPermissions(this, PERMISSIONS)){
             ActivityCompat.requestPermissions(this, PERMISSIONS, PERMISSION_ALL);
+        } else {
+            onCreateStuffToDo();
         }
+    }
 
+    public void onCreateStuffToDo() {
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
         PreferenceManager.setDefaultValues(this, R.xml.pref_general, false);
         PreferenceManager.setDefaultValues(this, R.xml.pref_drive, false);
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        ScanConstants.FOLDER_NAME = preferences.getString("folder_name"," ");
+        ScanConstants.FOLDER_NAME = preferences.getString("folder_name", " ");
         drive_email = preferences.getString("drive_email", " ");
 
         createImageFolder();
 
-        if(ScanConstants.CROP_URI == "notYet") {
+        if (ScanConstants.CROP_URI == "notYet") {
             File[] checkEmptiness = mImageFolder.listFiles();
             if (checkEmptiness == null) {
                 list = imageReader(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM));
@@ -387,7 +388,6 @@ public class MainActivity extends AppCompatActivity implements IScanner, GoogleA
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-
         try {
             if(requestCode == REQUEST_IMAGE_CAPTURE) {
                 Bitmap bitmap = uriToBitmap(getApplicationContext() , Uri.parse(mCurrentPhotoPath));
@@ -448,7 +448,7 @@ public class MainActivity extends AppCompatActivity implements IScanner, GoogleA
         }
     }
 
-    public void onClickCreateFile(View view) throws IOException {
+    public void onClickCreateFile(View view) {
         PreferenceManager.setDefaultValues(this, R.xml.pref_general, false);
         PreferenceManager.setDefaultValues(this, R.xml.pref_drive, false);
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
@@ -471,12 +471,11 @@ public class MainActivity extends AppCompatActivity implements IScanner, GoogleA
                 Toast.makeText(this, "Saving...", Toast.LENGTH_SHORT).show();
                 saveFileToGoogleDrive();
             }
-        } else if (driveOption.equalsIgnoreCase("OneDrive")) { // Put the function here
+        } else if (driveOption.equalsIgnoreCase("OneDrive")) {
             saveFileToOneDrive(view);
         } else {
             Toast.makeText(this, "Select a drive option from the settings.", Toast.LENGTH_SHORT).show();
         }
-
     }
 
     private void saveFileToGoogleDrive() {
@@ -515,37 +514,23 @@ public class MainActivity extends AppCompatActivity implements IScanner, GoogleA
                 });
     }
 
-    // NOT SAVING!!!
-    public void saveFileToOneDrive(View view) throws IOException {
+    public void saveFileToOneDrive(View view) {
         one_saver = true;
 
-        /*
         scannedImageView = (ImageView) findViewById(R.id.scannedImage);
         final Bitmap image = ((BitmapDrawable)scannedImageView.getDrawable()).getBitmap();
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        ByteArrayOutputStream bitmapStream = new ByteArrayOutputStream();
-        image.compress(Bitmap.CompressFormat.PNG, 100, bitmapStream);
-        byte[] bitmapdata = bos.toByteArray();
-
         String timestamp = new SimpleDateFormat("yyyyMMdd HHmmss").format(new Date());
-        String prepend = "MyCamApp" + timestamp + "_";
-        File file = new File(Environment.getExternalStorageDirectory() + "/Pictures/", prepend);
-        FileOutputStream fos = null;
-        try {
-            fos = new FileOutputStream(file);
-            fos.write(bitmapdata);
-            fos.flush();
-            fos.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        */
-        final String filename = "testingOneDrive.txt";
-        final File f = new File(getApplicationContext().getFilesDir(), filename);
-
+        String prepend = "MyCamApp" + "_" + timestamp;
 
         mSaver = Saver.createSaver(ONEDRIVE_Client_ID);
-        mSaver.startSaving((Activity)view.getContext(), filename, Uri.parse("file://" + f.getAbsolutePath())); //prepend, Uri.parse(file.getAbsolutePath()));
+        mSaver.startSaving(this, prepend, getImageUri(this, image) );
+    }
+
+    public Uri getImageUri(Context inContext, Bitmap inImage) {
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+        String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, "Title", null);
+        return Uri.parse(path);
     }
 
     @Override

@@ -29,7 +29,7 @@ import com.google.android.gms.drive.OpenFileActivityOptions;
  */
 public abstract class ConnectDriveService extends AppCompatActivity {
 
-    private static final String TAG = "BaseDriveActivity";
+    public static final String TAG = "BaseDriveActivity";
 
     /**
      * Request code for Google Sign-in

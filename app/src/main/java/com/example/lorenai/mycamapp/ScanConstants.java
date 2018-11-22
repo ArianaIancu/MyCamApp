@@ -1,7 +1,5 @@
 package com.example.lorenai.mycamapp;
 
-import android.net.Uri;
-
 /**
  * Created by jhansi on 15/03/15.
  */
