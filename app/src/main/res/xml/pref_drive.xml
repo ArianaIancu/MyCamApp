@@ -14,6 +14,13 @@
         android:singleLine="true"
         android:title="@string/title_drive_email" />
 
+    <ListPreference
+        android:key="choosing_drive"
+        android:title="Drive"
+        android:summary="@string/pref_description_choosing_email"
+        android:entries="@array/cDrive"
+        android:entryValues="@array/cDrive" />
+
     <SwitchPreference
         android:defaultValue="false"
         android:key="send_email"

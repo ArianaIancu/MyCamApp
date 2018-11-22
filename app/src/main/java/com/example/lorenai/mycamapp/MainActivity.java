@@ -1,5 +1,7 @@
 package com.example.lorenai.mycamapp;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
 
 import java.util.Date;
@@ -10,6 +12,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.ByteArrayOutputStream;
 
+import android.app.Activity;
 import android.net.Uri;
 import android.util.Log;
 import android.Manifest;
@@ -59,6 +62,11 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.GoogleApiAvailability;
+
+import com.microsoft.onedrivesdk.saver.ISaver;
+import com.microsoft.onedrivesdk.saver.Saver;
+import com.microsoft.onedrivesdk.saver.SaverException;
+
 
 public class MainActivity extends AppCompatActivity implements IScanner, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
@@ -393,9 +401,22 @@ public class MainActivity extends AppCompatActivity implements IScanner, GoogleA
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        if (one_saver == true) {
+            try {
+                mSaver.handleSave(requestCode, resultCode, data);
+                Toast.makeText(this, "File saved to OneDrive!", Toast.LENGTH_LONG).show();
+                one_saver = false;
+            } catch (final SaverException e) {
+                Log.e("OneDriveSaver", e.getErrorType().toString());
+                Toast.makeText(this, "OneDrive saving failed!", Toast.LENGTH_LONG).show();
+                one_saver = false;
+                e.getDebugErrorInfo();
+            }
+        }
     }
 
-    // Google Drive Here
+    // Drive Options Here
 
     public DriveFile file;
     private GoogleApiClient mGoogleApiClient;
@@ -406,7 +427,11 @@ public class MainActivity extends AppCompatActivity implements IScanner, GoogleA
     private static String drive_email;
     private static final String TAG = "Google Drive Activity";
 
-    public void connectDude() {
+    private ISaver mSaver;
+    private static boolean one_saver = false;
+    final static String ONEDRIVE_Client_ID = "2894a74e-f2c9-483e-b437-f6730a18c068";
+
+    public void connectDudeGoogle() {
         if (drive_email.isEmpty()) {
             Log.i(TAG, "There is no email given");
         } else {
@@ -423,26 +448,38 @@ public class MainActivity extends AppCompatActivity implements IScanner, GoogleA
         }
     }
 
-    public void onClickCreateFile(View view) {
-        connectDude();
-        if (drive_email.isEmpty()) {
-            android.support.v7.app.AlertDialog alertDialog = new android.support.v7.app.AlertDialog.Builder(this).create();
-            alertDialog.setTitle("Invalid Account");
-            alertDialog.setMessage("The specified account does not exist on this device. Please choose a different account in the Settings Menu.");
-            alertDialog.setButton(android.support.v7.app.AlertDialog.BUTTON_NEUTRAL, "OK",
-                    new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                        }
-                    });
-            alertDialog.show();
+    public void onClickCreateFile(View view) throws IOException {
+        PreferenceManager.setDefaultValues(this, R.xml.pref_general, false);
+        PreferenceManager.setDefaultValues(this, R.xml.pref_drive, false);
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String driveOption = preferences.getString("choosing_drive"," ");
+
+        if (driveOption.equalsIgnoreCase("Google Drive")) {
+            connectDudeGoogle();
+            if (drive_email.isEmpty()) {
+                android.support.v7.app.AlertDialog alertDialog = new android.support.v7.app.AlertDialog.Builder(this).create();
+                alertDialog.setTitle("Invalid Account");
+                alertDialog.setMessage("The specified account does not exist on this device. Please choose a different account in the Settings Menu.");
+                alertDialog.setButton(android.support.v7.app.AlertDialog.BUTTON_NEUTRAL, "OK",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        });
+                alertDialog.show();
+            } else {
+                Toast.makeText(this, "Saving...", Toast.LENGTH_SHORT).show();
+                saveFileToGoogleDrive();
+            }
+        } else if (driveOption.equalsIgnoreCase("OneDrive")) { // Put the function here
+            saveFileToOneDrive(view);
         } else {
-            Toast.makeText(this, "Saving...", Toast.LENGTH_SHORT).show();
-            saveFileToDrive();
+            Toast.makeText(this, "Select a drive option from the settings.", Toast.LENGTH_SHORT).show();
         }
+
     }
 
-    private void saveFileToDrive() {
+    private void saveFileToGoogleDrive() {
         scannedImageView = (ImageView) findViewById(R.id.scannedImage);
         Log.i(TAG, "Creating new contents.");
         final Bitmap image = ((BitmapDrawable)scannedImageView.getDrawable()).getBitmap();
@@ -476,6 +513,39 @@ public class MainActivity extends AppCompatActivity implements IScanner, GoogleA
                         }
                     }
                 });
+    }
+
+    // NOT SAVING!!!
+    public void saveFileToOneDrive(View view) throws IOException {
+        one_saver = true;
+
+        /*
+        scannedImageView = (ImageView) findViewById(R.id.scannedImage);
+        final Bitmap image = ((BitmapDrawable)scannedImageView.getDrawable()).getBitmap();
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        ByteArrayOutputStream bitmapStream = new ByteArrayOutputStream();
+        image.compress(Bitmap.CompressFormat.PNG, 100, bitmapStream);
+        byte[] bitmapdata = bos.toByteArray();
+
+        String timestamp = new SimpleDateFormat("yyyyMMdd HHmmss").format(new Date());
+        String prepend = "MyCamApp" + timestamp + "_";
+        File file = new File(Environment.getExternalStorageDirectory() + "/Pictures/", prepend);
+        FileOutputStream fos = null;
+        try {
+            fos = new FileOutputStream(file);
+            fos.write(bitmapdata);
+            fos.flush();
+            fos.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        */
+        final String filename = "testingOneDrive.txt";
+        final File f = new File(getApplicationContext().getFilesDir(), filename);
+
+
+        mSaver = Saver.createSaver(ONEDRIVE_Client_ID);
+        mSaver.startSaving((Activity)view.getContext(), filename, Uri.parse("file://" + f.getAbsolutePath())); //prepend, Uri.parse(file.getAbsolutePath()));
     }
 
     @Override
