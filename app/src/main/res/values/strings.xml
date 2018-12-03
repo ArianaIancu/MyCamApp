@@ -1,34 +1,44 @@
 <resources>
-    <string name="app_name">MyCamApp</string>
+    <string name="app_name" translatable="false">MyCamApp</string>
 
-    <string name="title_home">Gallery</string>
-    <string name="title_dashboard">Camera</string>
-    <string name="title_notifications">Settings</string>
-    <string name="title_activity_settings">Settings</string>
+    <string name="title_home" translatable="false">Gallery</string>
+    <string name="title_dashboard" translatable="false">Camera</string>
+    <string name="title_notifications" translatable="false">Settings</string>
+    <string name="title_activity_settings" translatable="false">Settings</string>
 
-    <string name="scan">Next</string>
-    <string name="loading">Loading</string>
-    <string name="low_memory">Low Memory</string>
-    <string name="applying_filter">Applying filter</string>
-    <string name="YOUR_API_KEY">AIzaSyDbAqFoPLdSGRtIdeQzbgViBE7APtpjxCg</string>
-    <string name="low_memory_message">Your phone is low on memory, you may feel some lags while editing images.</string>
+    <string name="scan" translatable="false">Next</string>
+    <string name="loading" translatable="false">Loading</string>
+    <string name="low_memory" translatable="false">Low Memory</string>
+    <string name="applying_filter" translatable="false">Applying filter</string>
+    <string name="YOUR_API_KEY" translatable="false">AIzaSyDbAqFoPLdSGRtIdeQzbgViBE7APtpjxCg</string>
+    <string name="low_memory_message" translatable="false">Your phone is low on memory, you may feel some lags while editing images.</string>
 
     <!-- Strings related to Settings -->
 
     <!-- General Settings -->
 
-    <string name="pref_header_general">General</string>
-    <string name="pref_title_display_name">App Folder Name</string>
-    <string name="pref_title_social_recommendations">Enable color finder</string>
-    <string name="pref_description_social_recommendations">After editing, detect the main color from your image</string>
+    <string name="pref_header_general" translatable="false">General</string>
+    <string name="pref_title_display_name" translatable="false">App Folder Name</string>
+    <string name="pref_title_social_recommendations" translatable="false">Enable color finder</string>
+    <string name="pref_description_social_recommendations" translatable="false">After editing, detect the main color from your image</string>
+    <string name="pref_description_choosing_cropping" translatable="false">Choose cropping method</string>
+
+    <string-array name="cCrop">
+        <item>Default</item>
+        <item>Angle Mode</item>
+    </string-array>
+    <string-array name="cCropValues">
+        <item>1</item>
+        <item>2</item>
+    </string-array>
 
     <!-- Drive Settings -->
-    <string name="pref_header_drive">Emails</string>
-    <string name="title_drive_email"> Google Drive Email </string>
-    <string name="drive_email_description"> Restart app after changing the email </string>
-    <string name="pref_title_send_email">Enable sending email</string>
-    <string name="pref_description_send_email">After editing, send the picture as an email </string>
-    <string name="pref_description_choosing_email">Choose which drive to use</string>
+    <string name="pref_header_drive" translatable="false">Emails</string>
+    <string name="title_drive_email" translatable="false"> Google Drive Email </string>
+    <string name="drive_email_description" translatable="false"> Restart app after changing the email </string>
+    <string name="pref_title_send_email" translatable="false">Enable sending email</string>
+    <string name="pref_description_send_email" translatable="false">After editing, send the picture as an email </string>
+    <string name="pref_description_choosing_email" translatable="false">Choose which drive to use</string>
 
     <string-array name="cDrive">
         <item>Google Drive</item>

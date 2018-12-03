@@ -189,7 +189,6 @@ public class MainActivity extends AppCompatActivity implements IScanner, GoogleA
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-
             convertView = getLayoutInflater().inflate(R.layout.single_grid, parent,false);
             ImageView iv = (ImageView) convertView.findViewById(R.id.imageViewPic);
 

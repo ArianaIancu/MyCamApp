@@ -1,6 +1,8 @@
 package com.example.lorenai.mycamapp;
 
+import android.content.SharedPreferences;
 import android.net.Uri;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
 import android.content.Intent;
@@ -17,6 +19,7 @@ import java.text.SimpleDateFormat;
 
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
+import com.yalantis.ucrop.UCrop;
 
 import java.io.File;
 import java.io.IOException;
@@ -35,7 +38,18 @@ public class CropImageMainAct extends AppCompatActivity implements CropImageView
         Intent i = getIntent();
         Uri uri = Uri.parse(i.getStringExtra("uri"));
 
-        CropImage.activity(uri).start(this);
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String cropOption = preferences.getString("choosing_cropping"," ");
+        if(cropOption.equalsIgnoreCase("2")) {
+            UCrop.Options options = new UCrop.Options();
+            options.setToolbarColor(getResources().getColor(R.color.colorPrimary));
+            options.setActiveWidgetColor(getResources().getColor(R.color.colorPrimary));
+            UCrop.of(uri, uri)
+                    .withOptions(options)
+                    .start(this);
+        } else {
+            CropImage.activity(uri).start(this);
+        }
     }
 
     private void createImageFileName(Bitmap bitmap) throws  IOException {
@@ -81,6 +95,19 @@ public class CropImageMainAct extends AppCompatActivity implements CropImageView
             } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
                 finish();
             }
+        }
+        if (resultCode == RESULT_OK && requestCode == UCrop.REQUEST_CROP) {
+            final Uri resultUri = UCrop.getOutput(data);
+            try {
+                original = MediaStore.Images.Media.getBitmap(this.getContentResolver(), resultUri);
+                createImageFileName(original);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            ScanConstants.CROP_URI = resultUri.toString();
+            startActivity(new Intent(getApplicationContext(), MainActivity.class));
+        } else if (resultCode == UCrop.RESULT_ERROR) {
+            finish();
         }
     }
 

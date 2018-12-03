@@ -59,7 +59,11 @@
         </activity>
         <activity android:name=".ColorFinder" />
         <activity android:name=".ConnectDriveService" />
-        <activity android:name=".CropImageMainAct"></activity>
+        <activity android:name=".CropImageMainAct" />
+        <activity
+            android:name="com.yalantis.ucrop.UCropActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
     </application>
 
 </manifest>

@@ -83,7 +83,6 @@ public abstract class ConnectDriveService extends AppCompatActivity {
                     // appropriately
                     Log.e(TAG, "Sign-in failed.");
                     //finish();
-                    ScanConstants.EMAIL_GOOD = "bad";
                     return;
                 }
 
@@ -93,7 +92,6 @@ public abstract class ConnectDriveService extends AppCompatActivity {
                     initializeDriveClient(getAccountTask.getResult());
                 } else {
                     Log.e(TAG, "Sign-in failed.");
-                    ScanConstants.EMAIL_GOOD = "bad";
                  //   finish();
                     return;
                 }
@@ -120,15 +118,12 @@ public abstract class ConnectDriveService extends AppCompatActivity {
         requiredScopes.add(Drive.SCOPE_APPFOLDER);
         GoogleSignInAccount signInAccount = GoogleSignIn.getLastSignedInAccount(this);
         if (signInAccount != null && signInAccount.getGrantedScopes().containsAll(requiredScopes)) {
-            ScanConstants.EMAIL_CHANGED = "yes";
         }
         else {
-            ScanConstants.EMAIL_CHANGED = "no";
         }
         if (drive_email.isEmpty()) {
             Log.e(TAG, "Sign-in failed.");
             //finish();
-            ScanConstants.EMAIL_GOOD = "bad";
             return;
         } else {
             GoogleSignInOptions signInOptions =

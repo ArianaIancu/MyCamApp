@@ -4,7 +4,9 @@ import java.util.Date;
 import java.text.SimpleDateFormat;
 import static android.app.Activity.RESULT_OK;
 
+import android.content.SharedPreferences;
 import android.net.Uri;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import android.app.Activity;
@@ -15,6 +17,7 @@ import android.os.Environment;
 
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
+import com.yalantis.ucrop.UCrop;
 
 import java.io.File;
 import java.io.IOException;
@@ -65,7 +68,19 @@ public class ScanFragment extends Fragment implements CropImageView.OnSetImageUr
         sourceImageView = (ImageView) view.findViewById(R.id.sourceImageView);
         scanButton = (Button) view.findViewById(R.id.scanButton);
         scanButton.setOnClickListener(new ScanButtonClickListener());
-        CropImage.activity(getUri()).start(getContext(), this);
+
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+        String cropOption = preferences.getString("choosing_cropping"," ");
+        if(cropOption.equalsIgnoreCase("2")) {
+            UCrop.Options options = new UCrop.Options();
+            options.setToolbarColor(getResources().getColor(R.color.colorPrimary));
+            options.setActiveWidgetColor(getResources().getColor(R.color.colorPrimary));
+            UCrop.of(getUri(), getUri())
+                    .withOptions(options)
+                    .start(getActivity());
+        } else {
+            CropImage.activity(getUri()).start(getContext(), this);
+        }
     }
 
     private class ScanButtonClickListener implements View.OnClickListener {

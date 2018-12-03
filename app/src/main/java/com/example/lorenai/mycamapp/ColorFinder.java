@@ -5,7 +5,6 @@ import java.text.SimpleDateFormat;
 
 import android.content.Context;
 import android.net.Uri;
-import android.nfc.Tag;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
@@ -41,10 +40,8 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
 import com.google.android.gms.drive.Drive;
-import com.google.android.gms.drive.DriveId;
 import com.google.android.gms.drive.DriveApi;
 import com.google.android.gms.drive.DriveFile;
-import com.google.android.gms.drive.DriveFolder;
 import com.google.android.gms.drive.MetadataChangeSet;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.ResultCallback;
@@ -388,21 +385,6 @@ public class ColorFinder extends ConnectDriveService implements GoogleApiClient.
     private GoogleApiClient mGoogleApiClient;
 
     private String drive_email;
-    private String drive_created;
-
-    public DriveId fId;
-    public DriveId fIdRed;
-    public DriveId fIdBlue;
-    public DriveId fIdGreen;
-    public DriveId fIdPP;
-    public DriveId fIdYO;
-    public DriveId fIdDefault;
-
-    public String folderRed = "MyCamAppRed";
-    public String folderBlue = "MyCamAppBlue";
-    public String folderGreen = "MyCamAppGreen";
-    public String folderPP = "MyCamAppPurple&Pink";
-    public String folderYO = "MyCamAppYellow&Orange";
 
     private static final int REQUEST_CODE_CREATOR = 2;
     private static final int REQUEST_CODE_RESOLUTION = 3;
@@ -446,16 +428,12 @@ public class ColorFinder extends ConnectDriveService implements GoogleApiClient.
         }
     }
 
-    // GOOGLE DRIVE NOT WORKING AT ALL!!
     public void createFile() {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         ScanConstants.FOLDER_NAME = preferences.getString("folder_name", " ");
         drive_email = preferences.getString("drive_email", " ");
-        drive_created = preferences.getString("fIdCreated", " ");
         String driveOption = preferences.getString("choosing_drive", " ");
         if (driveOption.equalsIgnoreCase("Google Drive")) {
-            Toast.makeText(this, "Google Drive is not working here anymore.", Toast.LENGTH_SHORT).show();
-            /*
             connectDude();
             if (drive_email.isEmpty()) {
                 android.support.v7.app.AlertDialog alertDialog = new android.support.v7.app.AlertDialog.Builder(this).create();
@@ -469,31 +447,9 @@ public class ColorFinder extends ConnectDriveService implements GoogleApiClient.
                         });
                 alertDialog.show();
             } else {
-                if (drive_created.equals("true") && ScanConstants.EMAIL_CHANGED.equals("no")) {
-                    Toast.makeText(this, "Saving...", Toast.LENGTH_SHORT).show();
-                    saveFileToDrive();
-                } else if(!drive_email.equals(" ") && drive_created.equals("false") ) {
-                    if (getDriveResourceClient() == null) {
-                        Toast.makeText(this, "??", Toast.LENGTH_SHORT).show();
-                    } else {
-                        createFolderDefault();
-                        createFolderRed();
-                        createFolderBlue();
-                        createFolderGreen();
-                        createFolderPP();
-                        createFolderYO();
-
-                        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-                        SharedPreferences.Editor editor = sharedPref.edit();
-                        editor.putString("fIdCreated", "true");
-                        editor.apply();
-                        ScanConstants.EMAIL_CHANGED = "no";
-
-                        Log.i(TAG, "Created all Drive folders.");
-                        Toast.makeText(this, "Drive folders created. Try again to save photo.", Toast.LENGTH_LONG).show();
-                    }
-                }
-            } */
+                Toast.makeText(this, "Saving...", Toast.LENGTH_SHORT).show();
+                saveFileToGoogleDrive();
+            }
         } else if (driveOption.equalsIgnoreCase("OneDrive")) {
             saveFileToOneDrive();
         } else {
@@ -501,23 +457,9 @@ public class ColorFinder extends ConnectDriveService implements GoogleApiClient.
         }
     }
 
-    private void saveFileToDrive() {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        if (colorName == "Red") {
-            fId = DriveId.decodeFromString(preferences.getString("fIdRed", ""));
-        } else if (colorName == "Green") {
-            fId = DriveId.decodeFromString(preferences.getString("fIdGreen", ""));
-        } else if (colorName == "Blue") {
-            fId = DriveId.decodeFromString(preferences.getString("fIdBlue", ""));
-        } else if (colorName == "Yellow/Orange") {
-            fId = DriveId.decodeFromString(preferences.getString("fIdYO", ""));
-        } else if (colorName == "Purple/Pink") {
-            fId = DriveId.decodeFromString(preferences.getString("fIdPP", ""));
-        } else {
-            fId = DriveId.decodeFromString(preferences.getString("fIdDefault", ""));
-        }
+    private void saveFileToGoogleDrive() {
         Log.i(TAG, "Creating new contents.");
-        final Bitmap image = ((BitmapDrawable) scannedImageView.getDrawable()).getBitmap();
+        final Bitmap image = ((BitmapDrawable)scannedImageView.getDrawable()).getBitmap();
         Drive.DriveApi.newDriveContents(mGoogleApiClient)
                 .setResultCallback(new ResultCallback<DriveApi.DriveContentsResult>() {
                     @Override
@@ -540,7 +482,6 @@ public class ColorFinder extends ConnectDriveService implements GoogleApiClient.
                                 .newCreateFileActivityBuilder()
                                 .setInitialMetadata(metadataChangeSet)
                                 .setInitialDriveContents(result.getDriveContents())
-                                .setActivityStartFolder(fId)
                                 .build(mGoogleApiClient);
                         try {
                             startIntentSenderForResult(intentSender, REQUEST_CODE_CREATOR, null, 0, 0, 0);
@@ -549,170 +490,6 @@ public class ColorFinder extends ConnectDriveService implements GoogleApiClient.
                         }
                     }
                 });
-    }
-
-    // Create Drive Folders
-
-    public void createFolderRed() {
-        if (getDriveResourceClient() == null) {
-            Log.i(TAG, "Google Drive Bad Email");
-        } else {
-            getDriveResourceClient().getRootFolder().continueWithTask(task -> {
-                DriveFolder parentFolder = task.getResult();
-                MetadataChangeSet changeSet = new MetadataChangeSet.Builder()
-                        .setTitle(folderRed)
-                        .setMimeType(DriveFolder.MIME_TYPE)
-                        .setStarred(true)
-                        .build();
-                return getDriveResourceClient().createFolder(parentFolder, changeSet);
-            }).addOnSuccessListener(this,
-                    driveFolder -> {
-                        fIdRed = driveFolder.getDriveId();
-                        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-                        SharedPreferences.Editor editor = sharedPref.edit();
-                        editor.putString("fIdRed", String.valueOf(fIdRed));
-                        editor.apply();
-                        Log.i(TAG, "Created folder");
-                    })
-                    .addOnFailureListener(this, e -> {
-                        Log.e(TAG, "Unable to create folder", e);
-                    });
-        }
-    }
-
-    public void createFolderBlue() {
-        if (getDriveResourceClient() == null) {
-            Log.i(TAG, "Google Drive Bad Email");
-        } else {
-            getDriveResourceClient().getRootFolder().continueWithTask(task -> {
-                DriveFolder parentFolder = task.getResult();
-                MetadataChangeSet changeSet = new MetadataChangeSet.Builder()
-                        .setTitle(folderBlue)
-                        .setMimeType(DriveFolder.MIME_TYPE)
-                        .setStarred(true)
-                        .build();
-                return getDriveResourceClient().createFolder(parentFolder, changeSet);
-            }).addOnSuccessListener(this,
-                    driveFolder -> {
-                        fIdBlue = driveFolder.getDriveId();
-                        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-                        SharedPreferences.Editor editor = sharedPref.edit();
-                        editor.putString("fIdBlue", String.valueOf(fIdBlue));
-                        editor.apply();
-                        Log.i(TAG, "Created folder");
-                    })
-                    .addOnFailureListener(this, e -> {
-                        Log.e(TAG, "Unable to create folder", e);
-                    });
-        }
-    }
-
-    public void createFolderGreen() {
-        if (getDriveResourceClient() == null) {
-            Log.i(TAG, "Google Drive Bad Email");
-        } else {
-            getDriveResourceClient().getRootFolder().continueWithTask(task -> {
-                DriveFolder parentFolder = task.getResult();
-                MetadataChangeSet changeSet = new MetadataChangeSet.Builder()
-                        .setTitle(folderGreen)
-                        .setMimeType(DriveFolder.MIME_TYPE)
-                        .setStarred(true)
-                        .build();
-                return getDriveResourceClient().createFolder(parentFolder, changeSet);
-            }).addOnSuccessListener(this,
-                    driveFolder -> {
-                        fIdGreen = driveFolder.getDriveId();
-                        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-                        SharedPreferences.Editor editor = sharedPref.edit();
-                        editor.putString("fIdGreen", String.valueOf(fIdGreen));
-                        editor.apply();
-                        Log.i(TAG, "Created folder");
-                    })
-                    .addOnFailureListener(this, e -> {
-                        Log.e(TAG, "Unable to create folder", e);
-                    });
-        }
-    }
-
-    public void createFolderPP() {
-        if (getDriveResourceClient() == null) {
-            Log.i(TAG, "Google Drive Bad Email");
-        } else {
-            getDriveResourceClient().getRootFolder().continueWithTask(task -> {
-                DriveFolder parentFolder = task.getResult();
-                MetadataChangeSet changeSet = new MetadataChangeSet.Builder()
-                        .setTitle(folderPP)
-                        .setMimeType(DriveFolder.MIME_TYPE)
-                        .setStarred(true)
-                        .build();
-                return getDriveResourceClient().createFolder(parentFolder, changeSet);
-            }).addOnSuccessListener(this,
-                    driveFolder -> {
-                        fIdPP = driveFolder.getDriveId();
-                        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-                        SharedPreferences.Editor editor = sharedPref.edit();
-                        editor.putString("fIdPP", String.valueOf(fIdPP));
-                        editor.apply();
-                        Log.i(TAG, "Created folder");
-                    })
-                    .addOnFailureListener(this, e -> {
-                        Log.e(TAG, "Unable to create folder", e);
-                    });
-        }
-    }
-
-    public void createFolderYO() {
-        if (getDriveResourceClient() == null) {
-            Log.i(TAG, "Google Drive Bad Email");
-        } else {
-            getDriveResourceClient().getRootFolder().continueWithTask(task -> {
-                DriveFolder parentFolder = task.getResult();
-                MetadataChangeSet changeSet = new MetadataChangeSet.Builder()
-                        .setTitle(folderYO)
-                        .setMimeType(DriveFolder.MIME_TYPE)
-                        .setStarred(true)
-                        .build();
-                return getDriveResourceClient().createFolder(parentFolder, changeSet);
-            }).addOnSuccessListener(this,
-                    driveFolder -> {
-                        fIdYO = driveFolder.getDriveId();
-                        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-                        SharedPreferences.Editor editor = sharedPref.edit();
-                        editor.putString("fIdYO", String.valueOf(fIdYO));
-                        editor.apply();
-                        Log.i(TAG, "Created folder");
-                    })
-                    .addOnFailureListener(this, e -> {
-                        Log.e(TAG, "Unable to create folder", e);
-                    });
-        }
-    }
-
-    public void createFolderDefault() {
-        if (getDriveResourceClient() == null) {
-            Log.i(TAG, "Google Drive Bad Email");
-        } else {
-            getDriveResourceClient().getRootFolder().continueWithTask(task -> {
-                DriveFolder parentFolder = task.getResult();
-                MetadataChangeSet changeSet = new MetadataChangeSet.Builder()
-                        .setTitle(ScanConstants.FOLDER_NAME)
-                        .setMimeType(DriveFolder.MIME_TYPE)
-                        .setStarred(true)
-                        .build();
-                return getDriveResourceClient().createFolder(parentFolder, changeSet);
-            }).addOnSuccessListener(this,
-                    driveFolder -> {
-                        fIdDefault = driveFolder.getDriveId();
-                        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-                        SharedPreferences.Editor editor = sharedPref.edit();
-                        editor.putString("fIdDefault", String.valueOf(fIdDefault));
-                        editor.apply();
-                        Log.i(TAG, "Created folder");
-                    })
-                    .addOnFailureListener(this, e -> {
-                        Log.e(TAG, "Unable to create folder", e);
-                    });
-        }
     }
 
     @Override

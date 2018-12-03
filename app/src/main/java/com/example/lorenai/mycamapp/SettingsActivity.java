@@ -214,7 +214,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             bindPreferenceSummaryToValue(findPreference("fIdPP"));
             bindPreferenceSummaryToValue(findPreference("fIdYO"));
             bindPreferenceSummaryToValue(findPreference("fIdDefault"));
-            bindPreferenceSummaryToValue(findPreference("fIdCreated"));
 
             // Hide some options
             EditTextPreference red = (EditTextPreference) findPreference("fIdRed");
@@ -223,7 +222,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             EditTextPreference PP = (EditTextPreference) findPreference("fIdPP");
             EditTextPreference YO = (EditTextPreference) findPreference("fIdYO");
             EditTextPreference Default = (EditTextPreference) findPreference("fIdDefault");
-            EditTextPreference Created = (EditTextPreference) findPreference("fIdCreated");
             PreferenceCategory mCategory = (PreferenceCategory) findPreference("hiddenDriveOptions");
             mCategory.removePreference(red);
             mCategory.removePreference(blue);
@@ -231,8 +229,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             mCategory.removePreference(PP);
             mCategory.removePreference(YO);
             mCategory.removePreference(Default);
-            mCategory.removePreference(Created);
-
         }
 
         @Override

@@ -10,6 +10,14 @@
         android:singleLine="true"
         android:title="@string/pref_title_display_name" />
 
+    <ListPreference
+        android:key="choosing_cropping"
+        android:title="Crop Option"
+        android:summary="@string/pref_description_choosing_cropping"
+        android:entries="@array/cCrop"
+        android:entryValues="@array/cCropValues"
+        android:defaultValue="1"/>
+
     <SwitchPreference
         android:defaultValue="true"
         android:key="example_switch"
